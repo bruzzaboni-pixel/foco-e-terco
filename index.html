@@ -1310,6 +1310,8 @@ function startPomo(){
   pomoState.isRunning=true;pomoState.endTime=Date.now()+pomoState.remaining*1000;
   if(pomoInterval)clearInterval(pomoInterval);pomoInterval=setInterval(pomoTick,250);
   updatePomoUI();Ambient.play(pomoState.phase==='focus'?'focus':'prayer');savePomoState();
+  // Ao iniciar a pausa, abre a janela do terço e continua de onde parou
+  if(pomoState.phase!=='focus')enterPrayer();
 }
 
 function pausePomo(){
@@ -1336,6 +1338,8 @@ async function handlePhaseEnd(){
     if(just==='long')pomoState.cycleIndex=0;else pomoState.cycleIndex++;
     pomoState.phase='focus';pomoState.remaining=POMO.FOCUS;
     playBell('focus');notify('Pausa concluída','Quando quiser, inicie um novo foco.');showToast('Pausa concluída — dê o play para focar');
+    // Ao terminar o terço, volta para a janela de foco (parada, aguardando o play)
+    if(document.getElementById('prayerScreen').style.display!=='none')await goHome();
   }
   // Nunca inicia a próxima fase sozinho: o usuário sempre dá o play.
   updatePomoUI();Ambient.stop();
