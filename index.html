@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foco e Terço · Pomodoro com Oração</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap');
+
+  :root {
+    --bg-1:#eef3fa;--bg-2:#f7f4ed;--surface:rgba(255,255,255,0.72);--surface-solid:#ffffff;
+    --border:rgba(91,125,177,0.18);--text:#1f2a44;--text-soft:#5b6781;--text-muted:#8c95a8;
+    --marian:#5b7db1;--marian-deep:#2c4a6e;--marian-light:#a8c0dd;--gold:#b8945a;--gold-soft:#d4b377;
+    --rosary-bead:#c9d4e6;--rosary-bead-large:#8aa3c8;--rosary-active:#d4b377;--rosary-done:#2c4a6e;
+    --rosary-chain:#b0bfd4;--shadow-soft:0 10px 40px -12px rgba(44,74,110,0.18);
+    --shadow-deep:0 20px 60px -20px rgba(44,74,110,0.28);
+  }
+  [data-theme="dark"] {
+    --bg-1:#0c1426;--bg-2:#131d33;--surface:rgba(26,41,66,0.7);--surface-solid:#1a2942;
+    --border:rgba(168,192,221,0.16);--text:#e8e4dc;--text-soft:#b8c2d4;--text-muted:#7a8499;
+    --marian:#7b9bd0;--marian-deep:#a8c0dd;--marian-light:#5b7db1;--gold:#d4b377;--gold-soft:#e6c89a;
+    --rosary-bead:#4a5a78;--rosary-bead-large:#7b9bd0;--rosary-active:#e6c89a;--rosary-done:#a8c0dd;
+    --rosary-chain:#3a4866;--shadow-soft:0 10px 40px -12px rgba(0,0,0,0.5);
+    --shadow-deep:0 20px 60px -20px rgba(0,0,0,0.6);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100vh;font-family:'Cormorant Garamond',Georgia,serif;color:var(--text);
+    background:var(--bg-1);-webkit-font-smoothing:antialiased;}
+  body{background:radial-gradient(ellipse at top,var(--bg-2) 0%,transparent 60%),
+    radial-gradient(ellipse at bottom right,rgba(91,125,177,0.08) 0%,transparent 50%),var(--bg-1);
+    background-attachment:fixed;overflow-x:hidden;}
+
+  header{position:relative;z-index:10;padding:1.5rem 2rem;display:flex;justify-content:space-between;
+    align-items:center;border-bottom:1px solid var(--border);backdrop-filter:blur(10px);background:var(--surface);}
+  .brand{display:flex;align-items:center;gap:0.85rem;cursor:pointer;}
+  .brand-mark{width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--marian);}
+  .brand-text{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:0.2em;font-weight:500;text-transform:uppercase;}
+  .brand-text span{color:var(--marian);}
+  .header-actions{display:flex;gap:0.5rem;align-items:center;}
+  .icon-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--border);background:transparent;
+    color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;}
+  .icon-btn:hover{color:var(--marian);border-color:var(--marian);transform:translateY(-1px);}
+
+  /* Indicador de som tocando */
+  .sound-indicator{display:none;align-items:center;gap:6px;padding:0.4rem 0.9rem;
+    border:1px solid var(--gold);border-radius:999px;font-family:'Cinzel',serif;
+    font-size:0.65rem;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;cursor:pointer;
+    background:transparent;transition:all 0.3s;}
+  .sound-indicator:hover{background:rgba(184,148,90,0.1);}
+  .sound-indicator.visible{display:flex;}
+  .sound-waves{display:flex;align-items:center;gap:2px;height:14px;}
+  .sound-waves span{display:inline-block;width:2px;background:var(--gold);border-radius:2px;animation:sw 1.2s ease-in-out infinite;}
+  .sound-waves span:nth-child(1){height:6px;animation-delay:0s;}
+  .sound-waves span:nth-child(2){height:12px;animation-delay:0.2s;}
+  .sound-waves span:nth-child(3){height:8px;animation-delay:0.4s;}
+  @keyframes sw{0%,100%{transform:scaleY(0.5);opacity:0.5;}50%{transform:scaleY(1);opacity:1;}}
+
+  main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem 5rem;}
+
+  .greeting-bar{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+  .date-line{font-family:'Cinzel',serif;font-size:0.78rem;letter-spacing:0.3em;color:var(--text-muted);text-transform:uppercase;}
+  .daily-stats{display:flex;gap:1.25rem;font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--text-soft);}
+  .daily-stats strong{color:var(--marian);font-weight:500;}
+
+  .liturgical-bar{background:var(--surface);backdrop-filter:blur(10px);border:1px solid var(--border);
+    border-radius:4px;padding:0.85rem 1.25rem;margin-bottom:1.5rem;display:flex;
+    justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .liturgical-season{display:flex;align-items:center;gap:0.6rem;color:var(--text-soft);
+    font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;}
+  .liturgical-color{width:10px;height:10px;border-radius:50%;background:var(--season-color,#6b9362);
+    box-shadow:0 0 0 2px var(--surface-solid),0 0 0 3px var(--border);}
+  .liturgical-info{color:var(--text);font-style:italic;font-size:1rem;text-align:right;}
+  .liturgical-info .feast{color:var(--gold);font-family:'Cinzel',serif;font-style:normal;
+    font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;margin-right:0.5rem;}
+
+  .mode-tabs{display:flex;gap:0.5rem;margin-bottom:1.5rem;background:var(--surface);
+    backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:4px;padding:0.4rem;}
+  .mode-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:0.5rem;
+    padding:0.75rem 1rem;background:transparent;border:none;border-radius:3px;
+    color:var(--text-muted);font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.12em;
+    text-transform:uppercase;cursor:pointer;transition:all 0.3s;}
+  .mode-tab:hover{color:var(--marian);}
+  .mode-tab.active{background:var(--marian-deep);color:#f7f4ed;}
+  [data-theme="dark"] .mode-tab.active{background:var(--marian);color:#0c1426;}
+
+  .pomodoro-card{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);
+    border-radius:4px;padding:2.5rem 2rem;box-shadow:var(--shadow-soft);position:relative;
+    overflow:hidden;text-align:center;margin-bottom:2rem;}
+  .pomodoro-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--marian),var(--gold),var(--marian),transparent);opacity:0.6;}
+  .pomodoro-card.break::before{background:linear-gradient(90deg,transparent,var(--gold),var(--gold-soft),var(--gold),transparent);opacity:0.9;}
+  .phase-label{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--marian);margin-bottom:0.5rem;}
+  .pomodoro-card.break .phase-label{color:var(--gold);}
+  .phase-subtitle{font-size:1.05rem;color:var(--text-soft);font-style:italic;margin-bottom:2rem;min-height:1.4em;}
+  .timer-wrap{position:relative;width:260px;height:260px;margin:0 auto 1.75rem;}
+  .timer-svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .timer-track{fill:none;stroke:var(--border);stroke-width:4;}
+  .timer-progress{fill:none;stroke:var(--marian);stroke-width:6;stroke-linecap:round;
+    transition:stroke-dashoffset 0.9s cubic-bezier(0.4,0,0.6,1),stroke 0.5s;}
+  .pomodoro-card.break .timer-progress{stroke:var(--gold);}
+  .pomodoro-card.long-break .timer-progress{stroke:var(--marian-light);}
+  .time-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .time-text{font-family:'DM Mono',monospace;font-size:3.4rem;font-weight:300;color:var(--text);letter-spacing:0.02em;line-height:1;font-variant-numeric:tabular-nums;}
+  .time-hint{font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.3em;color:var(--text-muted);text-transform:uppercase;margin-top:0.5rem;}
+  .pomo-dots{display:flex;justify-content:center;gap:0.7rem;margin-bottom:1.75rem;}
+  .pomo-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all 0.4s;}
+  .pomo-dot.done{background:var(--marian);transform:scale(1.1);}
+  .pomo-dot.current{background:var(--gold);transform:scale(1.3);box-shadow:0 0 0 4px rgba(184,148,90,0.18);}
+  .timer-controls{display:flex;justify-content:center;align-items:center;gap:1rem;}
+  .timer-btn{background:transparent;border:1px solid var(--border);color:var(--text-soft);
+    width:48px;height:48px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;}
+  .timer-btn:hover{border-color:var(--marian);color:var(--marian);transform:translateY(-1px);}
+  .timer-btn-main{width:72px;height:72px;background:var(--marian-deep);border-color:var(--marian-deep);color:#f7f4ed;box-shadow:var(--shadow-soft);}
+  [data-theme="dark"] .timer-btn-main{background:var(--marian);border-color:var(--marian);color:#0c1426;}
+  .timer-btn-main:hover{background:var(--marian);transform:translateY(-2px) scale(1.03);color:#fff;}
+  .pomodoro-card.break .timer-btn-main{background:var(--gold);border-color:var(--gold);color:#fff;}
+
+  .break-cta{display:none;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-soft) 100%);
+    border-radius:4px;padding:1.5rem 2rem;margin-bottom:2rem;text-align:center;
+    box-shadow:var(--shadow-soft);animation:breakPulse 2.5s ease-in-out infinite;}
+  .break-cta.visible{display:block;}
+  @keyframes breakPulse{0%,100%{box-shadow:0 10px 40px -12px rgba(184,148,90,0.4);}50%{box-shadow:0 15px 50px -10px rgba(184,148,90,0.6);}}
+  .break-cta-label{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.35em;color:rgba(255,255,255,0.85);text-transform:uppercase;margin-bottom:0.5rem;}
+  .break-cta-text{color:#fff;font-size:1.5rem;font-style:italic;margin-bottom:1.25rem;line-height:1.3;}
+  .break-cta-text strong{font-style:normal;font-family:'Cinzel',serif;font-weight:500;}
+  .btn-cta{display:inline-flex;align-items:center;gap:0.6rem;padding:0.9rem 2rem;background:#fff;
+    color:var(--marian-deep);border:none;border-radius:2px;font-family:'Cinzel',serif;
+    font-size:0.8rem;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;font-weight:500;}
+  .btn-cta:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.15);}
+
+  .mystery-card{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);
+    border-radius:4px;padding:2rem;box-shadow:var(--shadow-soft);position:relative;overflow:hidden;}
+  .mystery-card::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .mystery-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+  .mystery-label{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.4em;color:var(--gold);text-transform:uppercase;margin-bottom:0.5rem;}
+  .mystery-name{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:500;letter-spacing:0.05em;}
+  .mystery-day{color:var(--text-muted);font-size:0.95rem;font-style:italic;margin-top:0.2rem;}
+  .progress-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;
+    background:var(--border);border-radius:999px;font-family:'Cinzel',serif;font-size:0.7rem;
+    letter-spacing:0.15em;color:var(--text-soft);text-transform:uppercase;}
+  .progress-badge.in-progress{background:rgba(184,148,90,0.15);color:var(--gold);}
+  .progress-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);}
+  .progress-badge.in-progress .dot{background:var(--gold);animation:pulseDot 1.5s ease-in-out infinite;}
+  @keyframes pulseDot{0%,100%{opacity:1;}50%{opacity:0.4;}}
+  .mystery-list{list-style:none;margin-bottom:1.5rem;}
+  .mystery-list li{padding:0.55rem 0;color:var(--text-soft);font-size:1rem;line-height:1.5;
+    display:flex;gap:0.85rem;border-bottom:1px dashed var(--border);}
+  .mystery-list li:last-child{border-bottom:none;}
+  .mystery-list .num{font-family:'Cinzel',serif;font-size:0.7rem;color:var(--gold);min-width:22px;padding-top:0.25rem;}
+  .mystery-actions{display:flex;gap:0.75rem;flex-wrap:wrap;padding-top:1rem;border-top:1px solid var(--border);}
+
+  .btn-primary{display:inline-flex;align-items:center;gap:0.6rem;padding:0.9rem 1.75rem;
+    background:var(--marian-deep);color:#f7f4ed;border:none;border-radius:2px;
+    font-family:'Cinzel',serif;font-size:0.78rem;letter-spacing:0.22em;text-transform:uppercase;
+    cursor:pointer;transition:all 0.35s;box-shadow:var(--shadow-soft);}
+  .btn-primary:hover{background:var(--marian);transform:translateY(-2px);}
+  [data-theme="dark"] .btn-primary{background:var(--marian);color:#0c1426;}
+  [data-theme="dark"] .btn-primary:hover{background:var(--marian-deep);color:#fff;}
+  .btn-ghost{display:inline-flex;align-items:center;gap:0.5rem;padding:0.85rem 1.5rem;
+    background:transparent;color:var(--text-soft);border:1px solid var(--border);border-radius:2px;
+    font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;}
+  .btn-ghost:hover{border-color:var(--marian);color:var(--marian);}
+
+  /* PRAYER */
+  .prayer-screen{display:none;animation:fadeIn 0.6s ease;}
+  .prayer-screen.active{display:block;}
+  .prayer-pomo-indicator{background:var(--surface);backdrop-filter:blur(15px);border:1px solid var(--border);
+    border-left:3px solid var(--gold);border-radius:3px;padding:0.75rem 1.25rem;margin-bottom:1.25rem;
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+    font-family:'DM Mono',monospace;font-size:0.85rem;}
+  .prayer-pomo-indicator.hidden{display:none!important;}
+  .prayer-pomo-indicator .label{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;}
+  .prayer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+  .step-info{font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.3em;color:var(--text-muted);text-transform:uppercase;}
+  .step-info strong{color:var(--marian);font-weight:500;}
+  .progress-bar{flex:1;max-width:320px;height:2px;background:var(--border);position:relative;border-radius:2px;overflow:hidden;}
+  .progress-bar::after{content:'';position:absolute;inset:0;width:var(--progress,0%);
+    background:linear-gradient(90deg,var(--marian),var(--gold));transition:width 0.5s cubic-bezier(0.4,0,0.2,1);}
+  .prayer-grid{display:grid;grid-template-columns:260px 1fr;gap:2.5rem;align-items:start;}
+  @media(max-width:880px){.prayer-grid{grid-template-columns:1fr;gap:1.5rem;}.rosary-visual{max-width:220px;margin:0 auto;}}
+  .rosary-visual{position:sticky;top:1.5rem;background:var(--surface);backdrop-filter:blur(10px);
+    border:1px solid var(--border);border-radius:4px;padding:1.25rem;box-shadow:var(--shadow-soft);}
+  .rosary-visual svg{width:100%;height:auto;display:block;}
+  .prayer-card{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);
+    border-radius:4px;padding:2.5rem 2.25rem;box-shadow:var(--shadow-soft);position:relative;
+    min-height:460px;display:flex;flex-direction:column;}
+  .prayer-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--marian),var(--gold),var(--marian),transparent);opacity:0.6;}
+  .prayer-phase{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.35em;color:var(--gold);text-transform:uppercase;margin-bottom:0.75rem;}
+  .prayer-title{font-family:'Cinzel',serif;font-size:1.6rem;font-weight:500;letter-spacing:0.04em;margin-bottom:0.5rem;line-height:1.2;}
+  .prayer-meditation{font-style:italic;color:var(--marian);font-size:1.1rem;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);line-height:1.5;}
+  .prayer-text{font-size:1.28rem;line-height:1.8;color:var(--text-soft);white-space:pre-line;flex:1;}
+  .ave-counter{display:flex;gap:0.4rem;margin-top:1.25rem;flex-wrap:wrap;align-items:center;}
+  .ave-dot{width:11px;height:11px;border-radius:50%;background:var(--border);transition:all 0.4s;}
+  .ave-dot.filled{background:var(--marian);transform:scale(1.1);}
+  .ave-dot.current{background:var(--gold);transform:scale(1.35);box-shadow:0 0 0 4px rgba(184,148,90,0.2);}
+  .ave-label{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.25em;color:var(--text-muted);margin-left:0.5rem;text-transform:uppercase;}
+  .controls{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);gap:0.75rem;flex-wrap:wrap;}
+  .controls-group{display:flex;gap:0.75rem;flex-wrap:wrap;}
+  .btn-nav{display:inline-flex;align-items:center;gap:0.6rem;padding:0.8rem 1.4rem;background:transparent;
+    color:var(--text-soft);border:1px solid var(--border);border-radius:2px;font-family:'Cinzel',serif;
+    font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;}
+  .btn-nav:hover:not(:disabled){border-color:var(--marian);color:var(--marian);}
+  .btn-nav:disabled{opacity:0.3;cursor:not-allowed;}
+  .btn-next{background:var(--marian-deep);color:#f7f4ed;border-color:var(--marian-deep);}
+  [data-theme="dark"] .btn-next{background:var(--marian);color:#0c1426;border-color:var(--marian);}
+  .btn-next:hover:not(:disabled){background:var(--marian);color:#fff;}
+
+  /* COMPLETE */
+  .complete-screen{display:none;text-align:center;padding:3rem 1rem;animation:fadeUp 1s ease;}
+  .complete-screen.active{display:block;}
+  .complete-ornament{margin:0 auto 2rem;width:90px;color:var(--gold);animation:gentleGlow 3s ease-in-out infinite;}
+  @keyframes gentleGlow{0%,100%{opacity:0.6;transform:scale(1);}50%{opacity:1;transform:scale(1.05);}}
+  .complete-screen h2{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:500;margin-bottom:1rem;}
+  .complete-screen p{font-size:1.25rem;color:var(--text-soft);font-style:italic;max-width:540px;margin:0 auto 2rem;line-height:1.6;}
+  .complete-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(12,20,38,0.6);backdrop-filter:blur(8px);
+    display:none;align-items:flex-start;justify-content:center;z-index:100;padding:2rem 1rem;overflow-y:auto;}
+  .modal-overlay.active{display:flex;animation:fadeIn 0.3s ease;}
+  .modal{background:var(--surface-solid);border:1px solid var(--border);border-radius:4px;
+    max-width:640px;width:100%;box-shadow:var(--shadow-deep);overflow:hidden;animation:modalIn 0.4s cubic-bezier(0.16,1,0.3,1);}
+  @keyframes modalIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .modal-header{padding:1.5rem 2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .modal-header h3{font-family:'Cinzel',serif;font-size:1.1rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:500;}
+  .modal-body{padding:1.5rem 2rem 2rem;max-height:70vh;overflow-y:auto;}
+  .history-empty{text-align:center;padding:2rem;color:var(--text-muted);font-style:italic;}
+  .history-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;padding-bottom:1.5rem;margin-bottom:1.25rem;border-bottom:1px solid var(--border);}
+  .stat{text-align:center;}
+  .stat-num{font-family:'Cinzel',serif;font-size:1.8rem;color:var(--marian);font-weight:500;line-height:1;}
+  .stat-label{font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.2em;color:var(--text-muted);text-transform:uppercase;margin-top:0.4rem;}
+  .history-list{list-style:none;}
+  .history-item{padding:0.9rem 0;border-bottom:1px dashed var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+  .history-item:last-child{border-bottom:none;}
+  .history-date{font-family:'Cinzel',serif;font-size:0.82rem;letter-spacing:0.08em;}
+  .history-mystery{font-size:0.92rem;color:var(--text-soft);font-style:italic;text-align:right;}
+  .history-mystery::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:0.6rem;vertical-align:middle;}
+
+  /* SETTINGS */
+  .settings-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px dashed var(--border);gap:1rem;}
+  .settings-row:last-child{border-bottom:none;}
+  .settings-row.block-row{display:block;padding:1rem 0;border-bottom:1px dashed var(--border);}
+  .settings-label{font-family:'Cinzel',serif;font-size:0.78rem;letter-spacing:0.12em;text-transform:uppercase;}
+  .settings-hint{font-size:0.9rem;color:var(--text-muted);font-style:italic;margin-top:0.2rem;}
+  .toggle-switch{position:relative;width:46px;height:26px;background:var(--border);border-radius:999px;cursor:pointer;transition:background 0.3s;flex-shrink:0;}
+  .toggle-switch.active{background:var(--marian);}
+  .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.3s;}
+  .toggle-switch.active::after{transform:translateX(20px);}
+  .settings-divider{margin:1.25rem 0 0.5rem;text-align:center;position:relative;}
+  .settings-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border);}
+  .settings-divider span{position:relative;background:var(--surface-solid);padding:0 1rem;
+    font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;}
+  .settings-select{width:100%;padding:0.7rem 1rem;background:var(--bg-1);border:1px solid var(--border);
+    border-radius:2px;color:var(--text);font-family:'Cormorant Garamond',serif;font-size:1rem;
+    cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235b7db1' stroke-width='2' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;margin-top:0.6rem;}
+  .settings-select:focus{outline:none;border-color:var(--marian);}
+  .volume-slider{flex:1;appearance:none;-webkit-appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;}
+  .volume-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--marian);cursor:pointer;}
+  .volume-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--marian);cursor:pointer;border:none;}
+
+  /* Som descrição */
+  .sound-desc{display:none;margin-top:0.5rem;font-size:0.88rem;color:var(--text-muted);
+    font-style:italic;padding:0.6rem 0.9rem;background:rgba(91,125,177,0.06);border-radius:3px;
+    border-left:2px solid var(--marian-light);line-height:1.5;}
+  .sound-desc.visible{display:block;}
+
+  /* Upload de áudio */
+  .upload-wrap{display:none;margin-top:0.85rem;}
+  .upload-wrap.visible{display:block;}
+  .upload-area{border:2px dashed var(--border);border-radius:3px;padding:1.1rem;text-align:center;
+    cursor:pointer;transition:all 0.3s;background:transparent;user-select:none;}
+  .upload-area:hover{border-color:var(--marian);background:rgba(91,125,177,0.05);}
+  .upload-area.has-file{border-color:var(--gold);background:rgba(184,148,90,0.05);}
+  .upload-icon{font-size:1.4rem;margin-bottom:0.35rem;}
+  .upload-name{font-size:0.88rem;color:var(--text-soft);word-break:break-all;line-height:1.4;}
+  .upload-hint{font-size:0.72rem;color:var(--text-muted);margin-top:0.3rem;font-family:'DM Mono',monospace;letter-spacing:0.08em;}
+  .upload-sources{margin-top:0.5rem;font-size:0.83rem;color:var(--text-muted);font-style:italic;line-height:1.6;}
+  .upload-sources strong{color:var(--gold);font-style:normal;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+
+  /* BEADS */
+  .bead{fill:var(--rosary-bead);stroke:var(--rosary-chain);stroke-width:0.5;transition:all 0.5s;}
+  .bead.large{fill:var(--rosary-bead-large);}
+  .bead.done{fill:var(--rosary-done);opacity:0.85;}
+  .bead.done.large{fill:var(--rosary-done);opacity:1;}
+  .bead.active{fill:var(--rosary-active);filter:drop-shadow(0 0 6px var(--rosary-active));}
+  .chain{stroke:var(--rosary-chain);stroke-width:1;fill:none;}
+  .cross-svg{fill:var(--rosary-bead-large);transition:all 0.5s;}
+  .cross-svg.done{fill:var(--rosary-done);}
+  .cross-svg.active{fill:var(--rosary-active);filter:drop-shadow(0 0 8px var(--rosary-active));}
+  .medallion{fill:var(--rosary-bead-large);stroke:var(--gold);stroke-width:0.8;}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%) translateY(40px);
+    background:var(--marian-deep);color:#fff;padding:1rem 2rem;border-radius:4px;
+    font-family:'Cinzel',serif;font-size:0.85rem;letter-spacing:0.15em;text-transform:uppercase;
+    box-shadow:var(--shadow-deep);z-index:200;opacity:0;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
+    max-width:90%;text-align:center;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  [data-theme="dark"] .toast{background:var(--marian);color:#0c1426;}
+
+  /* ONBOARDING */
+  .onboarding-overlay{position:fixed;inset:0;background:var(--bg-1);display:none;
+    align-items:center;justify-content:center;z-index:200;padding:2rem 1rem;}
+  .onboarding-overlay.active{display:flex;animation:fadeIn 0.4s ease;}
+  .onboarding-card{max-width:480px;width:100%;background:var(--surface);backdrop-filter:blur(20px);
+    border:1px solid var(--border);border-radius:4px;padding:3rem 2.5rem;text-align:center;
+    box-shadow:var(--shadow-deep);position:relative;overflow:hidden;}
+  .onboarding-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--marian),var(--gold),var(--marian),transparent);opacity:0.7;}
+  .onboarding-icon{width:80px;height:80px;margin:0 auto 2rem;color:var(--marian);}
+  .onboarding-step{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.4em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem;}
+  .onboarding-title{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:500;margin-bottom:1.25rem;line-height:1.2;}
+  .onboarding-text{font-size:1.2rem;color:var(--text-soft);font-style:italic;line-height:1.6;margin-bottom:2.5rem;}
+  .onboarding-dots{display:flex;justify-content:center;gap:0.5rem;margin-bottom:2rem;}
+  .onboarding-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all 0.3s;}
+  .onboarding-dot.active{background:var(--marian);transform:scale(1.3);}
+  .onboarding-actions{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+  .onboarding-skip{background:transparent;border:none;color:var(--text-muted);font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;padding:0.5rem;}
+
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+  body[data-mode="focus"] .mystery-card,
+  body[data-mode="focus"] #breakCta{display:none;}
+  body[data-mode="prayer"] .pomodoro-card{display:none;}
+
+  @media(max-width:640px){
+    header{padding:1.1rem 1.25rem;}
+    main{padding:1.75rem 1rem 3rem;}
+    .pomodoro-card{padding:2rem 1.25rem;}
+    .timer-wrap{width:220px;height:220px;}
+    .time-text{font-size:2.8rem;}
+    .mystery-card,.prayer-card{padding:1.75rem 1.25rem;}
+    .prayer-card{min-height:360px;}
+    .controls{flex-direction:column;align-items:stretch;}
+    .controls-group{width:100%;justify-content:space-between;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand" onclick="goHome()">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+        <circle cx="12" cy="6" r="2.5"/><circle cx="12" cy="14" r="1.5" opacity="0.6"/>
+        <circle cx="8" cy="11" r="1" opacity="0.5"/><circle cx="16" cy="11" r="1" opacity="0.5"/>
+        <path d="M11 18h2v4h-2zm-1 1h4v1h-4z" opacity="0.7"/>
+      </svg>
+    </div>
+    <div class="brand-text">Foco <span>e Terço</span></div>
+  </div>
+  <div class="header-actions">
+    <button class="sound-indicator" id="soundIndicator" onclick="document.getElementById('settingsModal').classList.add('active')" title="Som tocando">
+      <div class="sound-waves"><span></span><span></span><span></span></div>
+      <span id="soundIndicatorLabel">som</span>
+    </button>
+    <button class="icon-btn" id="settingsBtn" title="Configurações">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9z"/></svg>
+    </button>
+    <button class="icon-btn" id="historyBtn" title="Histórico">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    </button>
+    <button class="icon-btn" id="themeBtn" title="Tema">
+      <svg id="iconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg id="iconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section id="home">
+    <div class="greeting-bar">
+      <div class="date-line" id="dateLine"></div>
+      <div class="daily-stats">
+        <span><strong id="pomosToday">0</strong> pomodoros</span>
+        <span>·</span>
+        <span><strong id="focusToday">0min</strong> focado</span>
+      </div>
+    </div>
+
+    <div class="liturgical-bar">
+      <div class="liturgical-season">
+        <span class="liturgical-color" id="liturgicalColor"></span>
+        <span id="liturgicalSeason">Tempo Comum</span>
+      </div>
+      <div class="liturgical-info" id="liturgicalInfo"></div>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="full" onclick="setMode('full')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Pomodoro + Terço
+      </button>
+      <button class="mode-tab" data-mode="focus" onclick="setMode('focus')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="10"/></svg>
+        Apenas Foco
+      </button>
+      <button class="mode-tab" data-mode="prayer" onclick="setMode('prayer')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L8 8h8z"/><circle cx="12" cy="14" r="1.5"/></svg>
+        Apenas Terço
+      </button>
+    </div>
+
+    <div class="pomodoro-card" id="pomoCard">
+      <div class="phase-label" id="phaseLabel">Foco</div>
+      <div class="phase-subtitle" id="phaseSubtitle">Pronto para começar</div>
+      <div class="timer-wrap">
+        <svg class="timer-svg" viewBox="0 0 200 200">
+          <circle class="timer-track" cx="100" cy="100" r="92"/>
+          <circle class="timer-progress" id="timerProgress" cx="100" cy="100" r="92" stroke-dasharray="578.05" stroke-dashoffset="0"/>
+        </svg>
+        <div class="time-display">
+          <div class="time-text" id="timeText">25:00</div>
+          <div class="time-hint" id="timeHint">25 minutos</div>
+        </div>
+      </div>
+      <div class="pomo-dots">
+        <div class="pomo-dot current"></div><div class="pomo-dot"></div>
+        <div class="pomo-dot"></div><div class="pomo-dot"></div>
+      </div>
+      <div class="timer-controls">
+        <button class="timer-btn" id="btnReset">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+        <button class="timer-btn timer-btn-main" id="btnStart">
+          <svg id="iconPlay" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="iconPause" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+        </button>
+        <button class="timer-btn" id="btnSkip">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="break-cta" id="breakCta">
+      <div class="break-cta-label">Pausa Ativa</div>
+      <div class="break-cta-text">É hora de <strong>rezar o Terço</strong></div>
+      <button class="btn-cta" onclick="enterPrayer()">
+        Rezar Agora
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div class="mystery-card">
+      <div class="mystery-header">
+        <div>
+          <div class="mystery-label">Mistério de Hoje</div>
+          <div class="mystery-name" id="mysteryName"></div>
+          <div class="mystery-day" id="mysteryDay"></div>
+        </div>
+        <div class="progress-badge" id="progressBadge">
+          <div class="dot"></div>
+          <span id="progressBadgeText">Não iniciado</span>
+        </div>
+      </div>
+      <ul class="mystery-list" id="mysteryList"></ul>
+      <div class="mystery-actions">
+        <button class="btn-primary" onclick="enterPrayer()">
+          <span id="btnPrayLabel">Iniciar Terço</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-ghost" onclick="resetRosary()" id="btnResetRosary" style="display:none;">Reiniciar Terço</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="prayer-screen" id="prayerScreen">
+    <div class="prayer-pomo-indicator hidden" id="prayerPomoIndicator">
+      <span class="label" id="prayerPomoLabel">Pausa</span>
+      <span style="font-variant-numeric:tabular-nums;color:var(--text);font-weight:500;" id="prayerPomoTime">5:00</span>
+    </div>
+    <div class="prayer-top">
+      <div class="step-info">Passo <strong id="stepNum">1</strong> de <strong id="stepTotal">0</strong></div>
+      <div class="progress-bar" id="progressBar"></div>
+      <button class="btn-nav" onclick="exitPrayer()">Voltar ao Foco</button>
+    </div>
+    <div class="prayer-grid">
+      <div class="rosary-visual" id="rosaryVisual"></div>
+      <div class="prayer-card" id="prayerCard"></div>
+    </div>
+  </section>
+
+  <section class="complete-screen" id="completeScreen">
+    <div class="complete-ornament">
+      <svg viewBox="0 0 100 100" width="90" height="90" fill="currentColor">
+        <circle cx="50" cy="50" r="3"/><circle cx="50" cy="20" r="2" opacity="0.6"/>
+        <circle cx="50" cy="80" r="2" opacity="0.6"/><circle cx="20" cy="50" r="2" opacity="0.6"/>
+        <circle cx="80" cy="50" r="2" opacity="0.6"/>
+        <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+      </svg>
+    </div>
+    <h2>Terço Completado</h2>
+    <p>Que Nossa Senhora interceda por suas intenções. Que a paz de Cristo permaneça em seu coração.</p>
+    <div class="complete-actions">
+      <button class="btn-primary" onclick="goHome()">Voltar ao Início</button>
+      <button class="btn-ghost" onclick="openHistory()">Ver Histórico</button>
+    </div>
+  </section>
+</main>
+
+<!-- Modais -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Histórico</h3>
+      <button class="icon-btn" onclick="closeModal('historyModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="historyBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Configurações</h3>
+      <button class="icon-btn" onclick="closeModal('settingsModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-row">
+        <div><div class="settings-label">Sino de transição</div><div class="settings-hint">Toque suave ao trocar de fase</div></div>
+        <div class="toggle-switch active" id="toggleSound" onclick="toggleSetting('sound')"></div>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Notificações</div><div class="settings-hint">Avisos do navegador</div></div>
+        <div class="toggle-switch" id="toggleNotif" onclick="toggleSetting('notif')"></div>
+      </div>
+
+      <div class="settings-divider"><span>Som Ambiente</span></div>
+
+      <div class="settings-row">
+        <div><div class="settings-label">Ativar</div><div class="settings-hint">Sons contínuos durante foco e oração</div></div>
+        <div class="toggle-switch active" id="toggleAmbient" onclick="toggleSetting('ambient')"></div>
+      </div>
+
+      <div class="settings-row block-row">
+        <div class="settings-label">Som de Foco</div>
+        <select class="settings-select" id="selectFocus" onchange="onSoundChange('focus',this.value)">
+          <option value="brown">🟤 Ruído Marrom — foco profundo</option>
+          <option value="rain">🌧️ Chuva Suave</option>
+          <option value="river">🏞️ Rio Tranquilo</option>
+          <option value="drone">🔉 Drone Grave</option>
+          <option value="youtube">▶️ YouTube (link próprio)</option>
+          <option value="custom">📁 Arquivo próprio (som real)</option>
+          <option value="off">— Sem som</option>
+        </select>
+        <div class="sound-desc" id="descFocus"></div>
+      </div>
+
+      <div class="settings-row block-row">
+        <div class="settings-label">Som de Oração</div>
+        <select class="settings-select" id="selectPrayer" onchange="onSoundChange('prayer',this.value)">
+          <option value="waterfallChoral">🌊 Cachoeira + Coral Sacro</option>
+          <option value="oceanBells">🌊 Oceano + Sinos</option>
+          <option value="sacredForest">🌿 Floresta Sagrada</option>
+          <option value="pad">🎵 Coral Sacro</option>
+          <option value="organ">🎹 Órgão Contemplativo</option>
+          <option value="bells">🔔 Sinos Distantes</option>
+          <option value="youtube">▶️ YouTube (link próprio)</option>
+          <option value="custom">📁 Arquivo próprio (som real)</option>
+          <option value="off">— Sem som</option>
+        </select>
+        <div class="sound-desc" id="descPrayer"></div>
+      </div>
+
+      <div class="settings-divider"><span>Seus arquivos de áudio</span></div>
+
+      <div class="settings-row block-row">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:0.75rem;">
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-soft);margin-bottom:0.4rem;">Para Foco</div>
+            <div id="focusFileName" style="font-size:0.8rem;color:var(--text-muted);font-style:italic;margin-bottom:0.6rem;min-height:1.1em;word-break:break-all;line-height:1.4;">Nenhum arquivo</div>
+            <button onclick="pickAudioFile('focus')" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.75rem 0.5rem;background:var(--marian-deep);color:#f7f4ed;border:none;border-radius:2px;font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">
+              📂 Escolher MP3
+            </button>
+            <input type="file" id="focusFileInput" accept="audio/*" style="display:none;" onchange="handleAudioUpload('focus',this.files[0])">
+            <button id="focusRemoveBtn" onclick="removeStoredAudio('focus')" style="display:none;width:100%;margin-top:0.4rem;padding:0.4rem;background:transparent;border:1px dashed rgba(184,148,90,0.4);border-radius:2px;color:var(--gold);font-size:0.65rem;font-family:'Cinzel',serif;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;">✕ Remover</button>
+          </div>
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-soft);margin-bottom:0.4rem;">Para Oração</div>
+            <div id="prayerFileName" style="font-size:0.8rem;color:var(--text-muted);font-style:italic;margin-bottom:0.6rem;min-height:1.1em;word-break:break-all;line-height:1.4;">Nenhum arquivo</div>
+            <button onclick="pickAudioFile('prayer')" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.75rem 0.5rem;background:var(--marian-deep);color:#f7f4ed;border:none;border-radius:2px;font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">
+              📂 Escolher MP3
+            </button>
+            <input type="file" id="prayerFileInput" accept="audio/*" style="display:none;" onchange="handleAudioUpload('prayer',this.files[0])">
+            <button id="prayerRemoveBtn" onclick="removeStoredAudio('prayer')" style="display:none;width:100%;margin-top:0.4rem;padding:0.4rem;background:transparent;border:1px dashed rgba(184,148,90,0.4);border-radius:2px;color:var(--gold);font-size:0.65rem;font-family:'Cinzel',serif;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;">✕ Remover</button>
+          </div>
+        </div>
+        <div style="font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.5;border-top:1px dashed var(--border);padding-top:0.6rem;">
+          Usado quando o dropdown acima está em <strong style="color:var(--text-soft);font-style:normal;">"Arquivo próprio"</strong>. Sons gratuitos: <span style="color:var(--gold);cursor:pointer;text-decoration:underline;" onclick="window.open('https://freesound.org','_blank')">freesound.org</span>
+        </div>
+      </div>
+
+      <div class="settings-divider"><span>YouTube</span></div>
+      <div class="settings-row block-row">
+        <div id="ytFileWarning" style="display:none;font-size:0.78rem;color:#c0392b;background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.25);border-radius:3px;padding:0.6rem 0.75rem;margin-bottom:0.85rem;line-height:1.5;">
+          ⚠️ Você abriu o app como arquivo local. O YouTube <strong>não funciona</strong> assim — publique o app online (veja a dica abaixo) para o link tocar.
+        </div>
+        <div style="display:grid;gap:0.9rem;">
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-soft);margin-bottom:0.4rem;">Link para Foco</div>
+            <input type="text" id="ytFocusUrl" placeholder="https://youtube.com/watch?v=..." style="width:100%;padding:0.6rem 0.7rem;background:var(--surface);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.8rem;" oninput="onYtUrlInput('focus',this.value)">
+          </div>
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-soft);margin-bottom:0.4rem;">Link para Oração</div>
+            <input type="text" id="ytPrayerUrl" placeholder="https://youtube.com/watch?v=..." style="width:100%;padding:0.6rem 0.7rem;background:var(--surface);border:1px solid var(--border);border-radius:2px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.8rem;" oninput="onYtUrlInput('prayer',this.value)">
+          </div>
+        </div>
+        <div style="font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.5;border-top:1px dashed var(--border);padding-top:0.6rem;margin-top:0.85rem;">
+          Cole o link e escolha <strong style="color:var(--text-soft);font-style:normal;">"▶️ YouTube"</strong> no som de Foco ou Oração acima. Alguns vídeos bloqueiam reprodução externa — se um não tocar, tente outro.
+        </div>
+      </div>
+
+      <div class="settings-row block-row">
+        <div class="settings-label" style="margin-bottom:0.5rem;">Volume</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted);flex-shrink:0"><path d="M11 5L6 9H2v6h4l5 4V5z"/></svg>
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" oninput="setVolume(this.value)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-muted);flex-shrink:0"><path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </div>
+      </div>
+
+      <div class="settings-divider"><span>Tempos</span></div>
+      <div class="settings-row block-row">
+        <div class="settings-hint" style="font-style:normal;line-height:2;">
+          Foco: <strong style="color:var(--marian);">25 min</strong> &nbsp;·&nbsp;
+          Pausa curta: <strong style="color:var(--gold);">5 min</strong> &nbsp;·&nbsp;
+          Pausa longa: <strong style="color:var(--marian);">15 min</strong> (após 4 pomodoros)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="ytPlayer" style="position:fixed;width:1px;height:1px;left:-9999px;top:-9999px;pointer-events:none;opacity:0;"></div>
+
+<div class="onboarding-overlay" id="onboardingOverlay">
+  <div class="onboarding-card">
+    <div class="onboarding-icon" id="onboardingIcon"></div>
+    <div class="onboarding-step" id="onboardingStep"></div>
+    <h2 class="onboarding-title" id="onboardingTitle"></h2>
+    <p class="onboarding-text" id="onboardingText"></p>
+    <div class="onboarding-dots">
+      <div class="onboarding-dot active"></div><div class="onboarding-dot"></div><div class="onboarding-dot"></div>
+    </div>
+    <div class="onboarding-actions">
+      <button class="onboarding-skip" onclick="finishOnboarding()">Pular</button>
+      <button class="btn-primary" id="onboardingNext" onclick="nextOnboardingStep()">
+        Próximo <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   ORAÇÕES
+================================================================ */
+const PRAYERS={
+  offering:`Divino Jesus,\nNós Vos oferecemos este Terço que vamos rezar,\nMeditando nos mistérios da Vossa Redenção.\nConcedei-nos,\nPor intercessão da Virgem Maria,\nMãe de Deus e nossa Mãe,\nAs virtudes que nos são necessárias\nPara bem rezá-lo\nE a graça de ganharmos as indulgências\nDesta santa devoção.`,
+  sign:`Em nome do Pai,\ndo Filho\ne do Espírito Santo.\n\nAmém.`,
+  credo:`Creio em Deus Pai\nTodo-Poderoso,\nCriador do céu e da terra,\ne em Jesus Cristo,\nseu único Filho, Nosso Senhor,\nque foi concebido pelo poder do Espírito Santo;\nnasceu da Virgem Maria;\npadeceu sob Pôncio Pilatos,\nfoi crucificado, morto e sepultado.\nDesceu à mansão dos mortos;\nressuscitou ao terceiro dia,\nsubiu aos Céus,\nestá sentado à direita de Deus Pai Todo-Poderoso,\nde onde há de vir a julgar os vivos e os mortos.\nCreio no Espírito Santo,\nna Santa Igreja Católica,\nna comunhão dos Santos,\nna remissão dos pecados,\nna ressurreição da carne,\nna vida eterna.\n\nAmém.`,
+  paternoster:`Pai Nosso,\nque estais nos Céus,\nsantificado seja o Vosso nome,\nvenha a nós o Vosso reino,\nseja feita a Vossa vontade,\nassim na terra como no Céu.\nO pão nosso de cada dia nos dai hoje,\nperdoai-nos as nossas ofensas,\nassim como nós perdoamos\na quem nos tem ofendido,\ne não nos deixeis cair em tentação,\nmas livrai-nos do mal.\n\nAmém.`,
+  avemaria:`Ave Maria, cheia de graça,\no Senhor é convosco,\nbendita sois Vós entre as mulheres\ne bendito é o fruto do Vosso ventre, Jesus.\n\nSanta Maria, Mãe de Deus,\nrogai por nós, pecadores,\nagora e na hora da nossa morte.\n\nAmém.`,
+  gloria:`Glória ao Pai, ao Filho\ne ao Espírito Santo.\nComo era no princípio,\nagora e sempre.\n\nAmém.`,
+  fatima:`Ó meu Jesus,\nperdoai-nos,\nlivrai-nos do fogo do inferno,\nlevai as almas todas para o Céu\ne socorrei principalmente\nas que mais precisarem.\n\nAmém.`,
+  thanks:`Infinitas graças vos damos,\nSoberana Rainha,\npelos benefícios que todos os dias\nrecebemos de vossa mão liberais.\nDignai-vos, agora e para sempre,\ntomar-nos debaixo do vosso poderoso amparo.`,
+  salve:`Salve Rainha, Mãe de Misericórdia,\nvida, doçura, esperança nossa, salve!\nA Vós bradamos, os degredados filhos de Eva;\na Vós suspiramos, gemendo e chorando\nneste vale de lágrimas.\n\nEia, pois, advogada nossa,\nesses Vossos olhos misericordiosos a nós volvei,\ne depois deste desterro nos mostrai a Jesus,\nbendito fruto do Vosso ventre,\nó clemente, ó piedosa, ó doce\nsempre Virgem Maria.\n\nV. Rogai por nós, Santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n\nAmém.`
+};
+
+const MYSTERIES={
+  glorious:{key:'glorious',name:'Mistérios Gloriosos',days:'Domingos e Quartas-feiras',items:['A Ressurreição de Cristo Nosso Senhor','A Ascensão de Nosso Senhor ao Céu','A Vinda do Espírito Santo sobre os Apóstolos reunidos com Maria Santíssima','A Assunção de Nossa Senhora ao Céu','A Coroação de Nossa Senhora no Céu como Rainha de todos os anjos e santos']},
+  joyful:{key:'joyful',name:'Mistérios Gozosos',days:'Segundas e Sábados',items:['A Anunciação do Arcanjo São Gabriel à Nossa Senhora','A Visitação de Nossa Senhora à sua prima Santa Isabel','O Nascimento do Menino Jesus em Belém','A Apresentação do Menino Jesus no Templo','A Perda e o Encontro do Menino Jesus no Templo']},
+  sorrowful:{key:'sorrowful',name:'Mistérios Dolorosos',days:'Terças e Sextas-feiras',items:['A Agonia de Cristo quando suou sangue no Horto','A Flagelação de Jesus Cristo atado à coluna','A Coroação de espinhos de Nosso Senhor','Jesus Cristo carregando a Cruz para o Calvário','A Crucificação e morte de Nosso Senhor Jesus Cristo']},
+  luminous:{key:'luminous',name:'Mistérios Luminosos',days:'Quintas-feiras',items:['O Batismo de Jesus no rio Jordão','A Auto-revelação de Jesus nas Bodas de Caná','O Anúncio do Reino de Deus','A Transfiguração de Jesus','A Instituição da Eucaristia']}
+};
+
+const DAYS_PT=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const MONTHS_PT=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+/* ================================================================
+   DESCRIÇÕES DOS SONS
+================================================================ */
+const SOUND_DESCS={
+  brown:'Ruído de baixa frequência que mascara distrações e induz estado de fluxo.',
+  rain:'Gotículas suaves sobre folhagem — ritmo natural que acalma a mente.',
+  river:'Corredeira suave com borbulhas — movimento contínuo, presença tranquila.',
+  drone:'Nota sustentada grave, como um sino que não para — ancoragem profunda.',
+  waterfallChoral:'Queda d\'água com acorde mariano suave — como rezar ao ar livre.',
+  oceanBells:'Ondas que vêm e vão com sinos ao longe — contemplação do infinito.',
+  sacredForest:'Vento entre árvores, riacho e pássaros com pad suave — natureza como oração.',
+  pad:'Vozes corais sintéticas em harmonia de ré menor — intimidade com o sagrado.',
+  organ:'Harmônicos de órgão de catedral — solenidade e reverência.',
+  bells:'Sinos esporádicos com drone suave — cada toque convida à atenção.',
+  custom:'Arquivo de áudio do seu computador — som real gravado.',
+  off:'—'
+};
+
+/* ================================================================
+   CALENDÁRIO LITÚRGICO
+================================================================ */
+function calcEaster(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da);}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);x.setHours(0,0,0,0);return x;}
+function sameDay(a,b){return a.getDate()===b.getDate()&&a.getMonth()===b.getMonth()&&a.getFullYear()===b.getFullYear();}
+
+function getLiturgicalInfo(date){
+  date=date||new Date();date.setHours(0,0,0,0);
+  const y=date.getFullYear(),easter=calcEaster(y),lent=addDays(easter,-46),pent=addDays(easter,49);
+  const advStart=(()=>{const n=new Date(y,10,27),d=n.getDay();return addDays(n,d===0?0:7-d);})();
+  const xmas=new Date(y,11,25),epi=new Date(y,0,6);
+  const baptism=(()=>{const d=epi.getDay();return d===0?new Date(y,0,7):addDays(epi,7-d);})();
+  let season='common',seasonName='Tempo Comum',color='#6b9362';
+  if(date>=advStart&&date<xmas){season='advent';seasonName='Advento';color='#7b4a8a';}
+  else if(date>=xmas&&date<=baptism){season='christmas';seasonName='Tempo do Natal';color='#e8e4dc';}
+  else if(date>=lent&&date<easter){season='lent';seasonName='Quaresma';color='#7b4a8a';}
+  else if(date>=easter&&date<=pent){season='easter';seasonName='Tempo Pascal';color='#e8e4dc';}
+  const m=date.getMonth(),d=date.getDate();
+  const fixed={'0-1':'Maria, Mãe de Deus','2-19':'São José','2-25':'Anunciação do Senhor','4-13':'N.Sra. de Fátima','4-22':'Santa Rita de Cássia','5-13':'Santo Antônio','5-29':'São Pedro e São Paulo','6-16':'N.Sra. do Carmo','7-15':'Assunção de N.Sra.','8-8':'Natividade de N.Sra.','9-7':'N.Sra. do Rosário','9-12':'N.Sra. Aparecida','10-1':'Todos os Santos','10-2':'Fiéis Defuntos','11-8':'Imaculada Conceição','11-25':'Natal do Senhor'};
+  let feast=null;
+  if(sameDay(date,easter))feast='Domingo de Páscoa';
+  else if(sameDay(date,addDays(easter,-7)))feast='Domingo de Ramos';
+  else if(sameDay(date,addDays(easter,-2)))feast='Sexta-feira Santa';
+  else if(sameDay(date,addDays(easter,49)))feast='Pentecostes';
+  else if(fixed[`${m}-${d}`])feast=fixed[`${m}-${d}`];
+  return{season,seasonName,color,feast,isLent:season==='lent'};
+}
+
+function getTodayMystery(){
+  const day=new Date().getDay(),info=getLiturgicalInfo();
+  if(info.isLent&&day===0)return MYSTERIES.sorrowful;
+  if(day===0||day===3)return MYSTERIES.glorious;
+  if(day===1||day===6)return MYSTERIES.joyful;
+  if(day===2||day===5)return MYSTERIES.sorrowful;
+  return MYSTERIES.luminous;
+}
+
+function generateSteps(mystery){
+  const steps=[];
+  const v=[{name:'pela Fé',intro:'Em honra a Deus Pai que nos criou'},{name:'pela Esperança',intro:'A Deus Filho que nos remiu'},{name:'pela Caridade',intro:'Ao Espírito Santo que nos santifica'}];
+  steps.push({phase:'Início',title:'Oferecimento do Terço',meditation:'Faça seus agradecimentos e pedidos a Deus.',text:PRAYERS.offering,bead:'cross'});
+  steps.push({phase:'Início',title:'Sinal da Cruz',meditation:'',text:PRAYERS.sign,bead:'cross'});
+  steps.push({phase:'Início',title:'Credo',meditation:'Segurando o crucifixo.',text:PRAYERS.credo,bead:'cross'});
+  steps.push({phase:'Início',title:'Pai Nosso',meditation:'Segure a primeira conta grande.',text:PRAYERS.paternoster,bead:'intro-pn'});
+  v.forEach((vi,i)=>steps.push({phase:'Início',title:`Ave-Maria ${vi.name}`,meditation:vi.intro,text:PRAYERS.avemaria,bead:`intro-ave-${i}`}));
+  steps.push({phase:'Início',title:'Glória ao Pai',meditation:'',text:PRAYERS.gloria,bead:'intro-glory'});
+  steps.push({phase:'Início',title:'Ó meu Jesus',meditation:'Oração de Fátima',text:PRAYERS.fatima,bead:'intro-glory'});
+  for(let d=0;d<5;d++){
+    const n=['1º','2º','3º','4º','5º'][d];
+    steps.push({phase:`${n} Mistério`,title:`${n} Mistério`,meditation:mystery.items[d],text:'Contemple este mistério em silêncio.',bead:`decade-${d}-mystery`,isMystery:true});
+    steps.push({phase:`${n} Mistério`,title:'Pai Nosso',meditation:'',text:PRAYERS.paternoster,bead:`decade-${d}-pn`});
+    for(let a=0;a<10;a++)steps.push({phase:`${n} Mistério`,title:'Ave-Maria',meditation:'',text:PRAYERS.avemaria,bead:`decade-${d}-ave-${a}`,aveIndex:a,decadeIndex:d});
+    steps.push({phase:`${n} Mistério`,title:'Glória ao Pai',meditation:'',text:PRAYERS.gloria,bead:`decade-${d}-glory`});
+    steps.push({phase:`${n} Mistério`,title:'Ó meu Jesus',meditation:'Oração de Fátima',text:PRAYERS.fatima,bead:`decade-${d}-glory`});
+  }
+  steps.push({phase:'Encerramento',title:'Oração de Agradecimento',meditation:'Ao final das 5 dezenas',text:PRAYERS.thanks,bead:'closing'});
+  steps.push({phase:'Encerramento',title:'Salve Rainha',meditation:'',text:PRAYERS.salve,bead:'closing'});
+  return steps;
+}
+
+function getCompletedBeads(steps,cur){
+  const last={};steps.forEach((s,i)=>{last[s.bead]=i;});
+  const done=new Set();
+  Object.entries(last).forEach(([b,i])=>{if(i<cur)done.add(b);});
+  return done;
+}
+
+function buildRosarySVG(currentBead,completed){
+  completed=completed||new Set();
+  const W=220,H=360,cx=W/2,lcy=115,rx=75,ry=90,total=55,sa=Math.PI/2;
+  const loopBeads=[];
+  for(let d=0;d<5;d++)for(let i=0;i<11;i++)loopBeads.push({decade:d,position:i,isLarge:i===0});
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  svg+=`<ellipse cx="${cx}" cy="${lcy}" rx="${rx}" ry="${ry}" class="chain"/>`;
+  loopBeads.forEach((b,idx)=>{
+    const angle=sa+(idx/total)*Math.PI*2,x=cx+rx*Math.cos(angle),y=lcy+ry*Math.sin(angle);
+    const beadId=`decade-${b.decade}-${b.position===0?'pn':`ave-${b.position-1}`}`;
+    const isGlory=currentBead===`decade-${b.decade}-glory`&&b.position===10;
+    const isMystery=currentBead===`decade-${b.decade}-mystery`&&b.position===0;
+    const isActive=currentBead===beadId||isGlory||isMystery;
+    const isDone=!isActive&&(completed.has(beadId)||(b.position===10&&completed.has(`decade-${b.decade}-glory`))||(b.position===0&&completed.has(`decade-${b.decade}-mystery`)));
+    let cls='bead';if(b.isLarge)cls+=' large';if(isActive)cls+=' active';else if(isDone)cls+=' done';
+    svg+=`<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${b.isLarge?5.5:3.5}" class="${cls}"/>`;
+  });
+  const medY=lcy+ry;
+  const medDone=completed.has('intro-glory')&&currentBead!=='intro-glory';
+  let medCls='medallion';if(currentBead==='intro-glory')medCls+=' active bead';else if(medDone)medCls+=' bead done';
+  svg+=`<circle cx="${cx}" cy="${medY+8}" r="7" class="${medCls}"/>`;
+  const tailSY=medY+18,tailEY=H-50,tailLen=tailEY-tailSY;
+  svg+=`<line x1="${cx}" y1="${tailSY}" x2="${cx}" y2="${tailEY}" class="chain"/>`;
+  for(let i=0;i<3;i++){const y=tailSY+tailLen*(0.2+i*0.15),bid=`intro-ave-${i}`,isA=currentBead===bid,isDn=!isA&&completed.has(bid);let cls='bead';if(isA)cls+=' active';else if(isDn)cls+=' done';svg+=`<circle cx="${cx}" cy="${y.toFixed(2)}" r="3.5" class="${cls}"/>`;}
+  const pnY=tailSY+tailLen*0.75,pnA=currentBead==='intro-pn',pnD=!pnA&&completed.has('intro-pn');
+  let pnCls='bead large';if(pnA)pnCls+=' active';else if(pnD)pnCls+=' done';
+  svg+=`<circle cx="${cx}" cy="${pnY.toFixed(2)}" r="5.5" class="${pnCls}"/>`;
+  const crossY=H-28,crA=currentBead==='cross',crD=!crA&&completed.has('cross');
+  let crCls='cross-svg';if(crA)crCls+=' active';else if(crD)crCls+=' done';
+  svg+=`<g transform="translate(${cx},${crossY})" class="${crCls}"><rect x="-1.5" y="-14" width="3" height="28" rx="0.5"/><rect x="-7" y="-7" width="14" height="3" rx="0.5"/></g></svg>`;
+  return svg;
+}
+
+/* ================================================================
+   STORAGE
+================================================================ */
+const storage={
+  async get(k,fb=null){try{if(window.storage&&typeof window.storage.get==='function'){const r=await window.storage.get(k);return r?JSON.parse(r.value):fb;}const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch(e){return fb;}},
+  async set(k,v){try{if(window.storage&&typeof window.storage.set==='function'){await window.storage.set(k,JSON.stringify(v));}else{localStorage.setItem(k,JSON.stringify(v));}}catch(e){}}
+};
+
+/* ================================================================
+   MOTOR DE SOM AMBIENTE — Web Audio API puro
+================================================================ */
+const Ambient={
+  ctx:null,masterGain:null,nodes:[],
+  enabled:true,focusSound:'brown',prayerSound:'waterfallChoral',
+  currentType:null,currentSound:null,volume:0.3,
+  FADE:1.2,
+  customAudio:{focus:null,prayer:null},
+  ytUrls:{focus:'',prayer:''},
+  yt:null,ytReady:false,ytPending:null,ytApiLoading:false,
+
+  async init(){
+    if(this.ctx)return;
+    try{this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.gain.value=0;this.masterGain.connect(this.ctx.destination);}catch(e){console.warn('AudioContext indisponível',e);}
+  },
+
+  async resume(){if(this.ctx&&this.ctx.state==='suspended')try{await this.ctx.resume();}catch(e){}},
+
+  setVolume(v){
+    this.volume=v;
+    if(this.masterGain&&this.ctx&&this.currentType&&this.currentSound!=='custom'){
+      const n=this.ctx.currentTime;this.masterGain.gain.cancelScheduledValues(n);
+      this.masterGain.gain.setValueAtTime(this.masterGain.gain.value,n);
+      this.masterGain.gain.linearRampToValueAtTime(v,n+0.3);
+    }
+    ['focus','prayer'].forEach(t=>{if(this.customAudio[t])this.customAudio[t].volume=v;});
+    if(this.currentSound==='youtube')this.applyYTVolume();
+  },
+
+  fadeIn(){if(!this.masterGain||!this.ctx)return;const n=this.ctx.currentTime;this.masterGain.gain.cancelScheduledValues(n);this.masterGain.gain.setValueAtTime(0,n);this.masterGain.gain.linearRampToValueAtTime(this.volume,n+this.FADE);},
+
+  fadeOut(cb){
+    if(!this.masterGain||!this.ctx){this.stopNodes();if(cb)cb();return;}
+    const n=this.ctx.currentTime;this.masterGain.gain.cancelScheduledValues(n);
+    this.masterGain.gain.setValueAtTime(this.masterGain.gain.value,n);
+    this.masterGain.gain.linearRampToValueAtTime(0,n+this.FADE);
+    setTimeout(()=>{this.stopNodes();this.currentType=null;this.currentSound=null;if(cb)cb();},this.FADE*1000+80);
+  },
+
+  stopNodes(){this.nodes.forEach(n=>{try{if(n.stop)n.stop();}catch(e){}try{if(n.disconnect)n.disconnect();}catch(e){}});this.nodes=[];},
+
+  stopCustom(type){
+    const a=type?[this.customAudio[type]]:[this.customAudio.focus,this.customAudio.prayer];
+    a.forEach(au=>{if(au&&!au.paused){au.pause();au.currentTime=0;}});
+  },
+
+  /* ── YouTube IFrame ── */
+  isFileProtocol(){return location.protocol==='file:';},
+  isInIframe(){try{return window.self!==window.top;}catch(e){return true;}},
+  isBlockedEnv(){return this.isFileProtocol()||this.isInIframe();},
+  blockedReason(){
+    if(this.isFileProtocol())return 'O YouTube não funciona com o app aberto como arquivo local. Publique online (ex.: Netlify) para o link tocar.';
+    if(this.isInIframe())return 'O YouTube não funciona dentro da pré-visualização do Claude. Baixe o arquivo e publique online (ex.: Netlify) para o link tocar.';
+    return '';
+  },
+
+  parseYouTubeId(url){
+    if(!url)return null;
+    url=url.trim();
+    // já é um ID puro (11 caracteres)
+    if(/^[A-Za-z0-9_-]{11}$/.test(url))return url;
+    try{
+      const u=new URL(url);
+      const host=u.hostname.replace('www.','');
+      if(host==='youtu.be')return u.pathname.slice(1,12)||null;
+      if(host.endsWith('youtube.com')){
+        if(u.searchParams.get('v'))return u.searchParams.get('v');
+        const m=u.pathname.match(/\/(embed|shorts|live)\/([A-Za-z0-9_-]{11})/);
+        if(m)return m[2];
+      }
+    }catch(e){
+      const m=url.match(/([A-Za-z0-9_-]{11})/);
+      if(m)return m[1];
+    }
+    return null;
+  },
+
+  loadYouTubeApi(){
+    if(window.YT&&window.YT.Player){this.onYTApiReady();return;}
+    if(this.ytApiLoading)return;
+    this.ytApiLoading=true;
+    window.onYouTubeIframeAPIReady=()=>this.onYTApiReady();
+    const tag=document.createElement('script');
+    tag.src='https://www.youtube.com/iframe_api';
+    tag.onerror=()=>{this.ytApiLoading=false;showToast('Não foi possível carregar o YouTube');};
+    document.head.appendChild(tag);
+  },
+
+  onYTApiReady(){
+    if(this.yt)return;
+    this.yt=new YT.Player('ytPlayer',{
+      height:'1',width:'1',
+      playerVars:{autoplay:1,controls:0,disablekb:1,fs:0,modestbranding:1,playsinline:1,rel:0,origin:location.origin},
+      events:{
+        onReady:()=>{this.ytReady=true;if(this.ytPending){const p=this.ytPending;this.ytPending=null;this.playYouTube(p.type,p.id);}},
+        onError:(e)=>{
+          const code=e.data;
+          if(code===101||code===150)showToast('Este vídeo bloqueia reprodução externa — tente outro link');
+          else if(code===2)showToast('Link do YouTube inválido');
+          else if(code===5||code===100)showToast('Vídeo indisponível para reprodução');
+          else showToast('Erro no YouTube ('+code+')');
+        },
+        onStateChange:(e)=>{
+          // mantém em loop mesmo se o "playlist" falhar
+          if(e.data===YT.PlayerState.ENDED&&this.currentSound==='youtube'&&this.yt){
+            try{this.yt.seekTo(0);this.yt.playVideo();}catch(_){}
+          }
+        }
+      }
+    });
+  },
+
+  startYouTube(type){
+    if(this.isBlockedEnv()){
+      showToast(this.blockedReason());
+      return false;
+    }
+    const id=this.parseYouTubeId(this.ytUrls[type]);
+    if(!id){showToast('Cole um link válido do YouTube nas configurações');return false;}
+    // para qualquer outra fonte
+    this.stopCustom();this.stopNodes();
+    if(this.currentType&&this.currentSound!=='youtube'&&this.currentSound!=='custom'){/* fadeOut já não aplicável */}
+    this.currentType=type;this.currentSound='youtube';
+    if(!window.YT||!window.YT.Player||!this.yt||!this.ytReady){
+      this.ytPending={type,id};
+      this.loadYouTubeApi();
+      this.updateIndicator();
+      return true;
+    }
+    this.playYouTube(type,id);
+    this.updateIndicator();
+    return true;
+  },
+
+  playYouTube(type,id){
+    if(!this.yt||!this.ytReady)return;
+    try{
+      // Inicia mudo garante autoplay; desmutamos logo após começar
+      this.yt.mute();
+      this.yt.loadVideoById({videoId:id});
+      this.yt.setLoop&&this.yt.setLoop(true);
+      const tryUnmute=(tries)=>{
+        if(this.currentSound!=='youtube'){return;}
+        const st=this.yt.getPlayerState&&this.yt.getPlayerState();
+        if(st===1){ // playing
+          this.yt.unMute();this.applyYTVolume();
+        }else if(tries>0){
+          setTimeout(()=>tryUnmute(tries-1),350);
+        }
+      };
+      this.yt.playVideo();
+      setTimeout(()=>tryUnmute(12),400);
+    }catch(e){showToast('Falha ao iniciar o vídeo');}
+  },
+
+  applyYTVolume(){
+    if(this.yt&&this.ytReady){try{this.yt.setVolume(Math.round(this.volume*100));}catch(e){}}
+  },
+
+  stopYouTube(){
+    this.ytPending=null;
+    if(this.yt&&this.ytReady){try{this.yt.stopVideo();}catch(e){}}
+  },
+
+  async play(type){
+    if(!this.enabled)return;
+    const sound=type==='focus'?this.focusSound:this.prayerSound;
+    if(sound==='off'){this.stop();return;}
+
+    if(sound==='youtube'){
+      // para Web Audio se tocando
+      if(this.currentType&&this.currentSound!=='youtube'&&this.currentSound!=='custom'){this.fadeOut();}
+      this.stopCustom();
+      this.startYouTube(type);
+      return;
+    }
+    // saindo do youtube para outra fonte
+    if(this.currentSound==='youtube'){this.stopYouTube();this.currentType=null;this.currentSound=null;}
+
+    if(sound==='custom'){
+      const au=this.customAudio[type];
+      if(!au){showToast('Nenhum arquivo carregado — escolha um nas configurações');return;}
+      // Para Web Audio se estava tocando
+      if(this.currentType&&this.currentSound!=='custom'){this.fadeOut();}else{this.stopNodes();}
+      // Para o áudio custom do outro tipo se estiver tocando
+      const other=type==='focus'?'prayer':'focus';
+      this.stopCustom(other);
+      this.currentType=type;this.currentSound='custom';
+      au.volume=this.volume;au.loop=true;
+      au.play().catch(e=>showToast('Erro ao reproduzir — recarregue o arquivo'));
+      this.updateIndicator();return;
+    }
+
+    // Se estava tocando custom, para
+    if(this.currentSound==='custom'){this.stopCustom();this.currentType=null;this.currentSound=null;}
+
+    await this.init();await this.resume();if(!this.ctx)return;
+    if(this.currentType===type&&this.currentSound===sound)return;
+    const start=()=>{this.currentType=type;this.currentSound=sound;this.build(sound);this.fadeIn();this.updateIndicator();};
+    if(this.currentType){this.fadeOut(start);}else{start();}
+  },
+
+  stop(){
+    if(this.currentSound==='youtube'){
+      this.stopYouTube();this.currentType=null;this.currentSound=null;this.updateIndicator();
+    }else if(this.currentSound==='custom'){
+      this.stopCustom();this.currentType=null;this.currentSound=null;this.updateIndicator();
+    }else if(this.currentType){
+      this.fadeOut(()=>this.updateIndicator());
+    }else{this.stopNodes();this.currentType=null;this.currentSound=null;this.updateIndicator();}
+  },
+
+  build(s){
+    const map={brown:()=>this.brownNoise(),rain:()=>this.rainNoise(),river:()=>this.riverFlow(),drone:()=>this.deepDrone(),waterfallChoral:()=>this.waterfallChoral(),oceanBells:()=>this.oceanBells(),sacredForest:()=>this.sacredForest(),pad:()=>this.choralPad(),organ:()=>this.organPad(),bells:()=>this.distantBells()};
+    if(map[s])map[s]();
+  },
+
+  updateIndicator(){
+    const el=document.getElementById('soundIndicator'),lbl=document.getElementById('soundIndicatorLabel');
+    if(!el)return;
+    if(this.currentType&&this.enabled){
+      el.classList.add('visible');
+      const names={brown:'foco',rain:'chuva',river:'rio',drone:'drone',waterfallChoral:'cachoeira',oceanBells:'oceano',sacredForest:'floresta',pad:'coral',organ:'órgão',bells:'sinos',custom:'arquivo',youtube:'youtube'};
+      if(lbl)lbl.textContent=names[this.currentSound]||'som';
+    }else el.classList.remove('visible');
+  },
+
+  /* ── helpers ── */
+  _noise(seconds=4,color='white'){
+    const sr=this.ctx.sampleRate,buf=this.ctx.createBuffer(1,seconds*sr,sr),data=buf.getChannelData(0);
+    if(color==='white'){for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;}
+    else if(color==='brown'){let l=0;for(let i=0;i<data.length;i++){const w=Math.random()*2-1;data[i]=(l+(0.02*w))/1.02;l=data[i];data[i]*=3.5;}}
+    else if(color==='pink'){let b=[0,0,0,0,0,0,0];for(let i=0;i<data.length;i++){const w=Math.random()*2-1;b[0]=0.99886*b[0]+w*0.0555179;b[1]=0.99332*b[1]+w*0.0750759;b[2]=0.96900*b[2]+w*0.1538520;b[3]=0.86650*b[3]+w*0.3104856;b[4]=0.55000*b[4]+w*0.5329522;b[5]=-0.7616*b[5]-w*0.0168980;data[i]=(b[0]+b[1]+b[2]+b[3]+b[4]+b[5]+b[6]+w*0.5362)*0.11;b[6]=w*0.115926;}}
+    const src=this.ctx.createBufferSource();src.buffer=buf;src.loop=true;return src;
+  },
+  _lfo(freq,amt,target){const l=this.ctx.createOscillator(),g=this.ctx.createGain();l.frequency.value=freq;g.gain.value=amt;l.connect(g);g.connect(target);l.start();this.nodes.push(l,g);},
+  _osc(freq,type='sine',gain=0.1){const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=type;o.frequency.value=freq;g.gain.value=gain;o.connect(g);o.start();this.nodes.push(o,g);return g;},
+  _bpf(freq,Q=1){const f=this.ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=freq;f.Q.value=Q;this.nodes.push(f);return f;},
+  _lpf(freq,Q=0.7){const f=this.ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=freq;f.Q.value=Q;this.nodes.push(f);return f;},
+  _hpf(freq){const f=this.ctx.createBiquadFilter();f.type='highpass';f.frequency.value=freq;this.nodes.push(f);return f;},
+  _gain(v=1){const g=this.ctx.createGain();g.gain.value=v;this.nodes.push(g);return g;},
+
+  /* ── RUÍDO MARROM ── */
+  brownNoise(){const src=this._noise(4,'brown');const f=this._lpf(800);const g=this._gain(0.55);src.connect(f).connect(g).connect(this.masterGain);src.start();this.nodes.push(src);},
+
+  /* ── CHUVA SUAVE ── */
+  rainNoise(){
+    const src=this._noise(2,'white');const hp=this._hpf(400);const lp=this._lpf(3500,0.5);
+    const g=this._gain(0.35);this._lfo(0.12,700,lp.frequency);
+    src.connect(hp).connect(lp).connect(g).connect(this.masterGain);src.start();this.nodes.push(src);
+  },
+
+  /* ── RIO TRANQUILO ── */
+  riverFlow(){
+    // Camada 1: ruído branco filtrado (água corrente)
+    const src=this._noise(3,'pink');const hp=this._hpf(200);const lp=this._lpf(2800,0.6);
+    const g=this._gain(0.4);
+    // LFO para simular borbulhas
+    this._lfo(3.5,600,lp.frequency);
+    this._lfo(0.25,300,lp.frequency);
+    src.connect(hp).connect(lp).connect(g).connect(this.masterGain);src.start();this.nodes.push(src);
+    // Camada 2: grave (correnteza)
+    const src2=this._noise(4,'brown');const f2=this._lpf(300);const g2=this._gain(0.2);
+    src2.connect(f2).connect(g2).connect(this.masterGain);src2.start();this.nodes.push(src2);
+  },
+
+  /* ── DRONE GRAVE ── */
+  deepDrone(){
+    const g=this._gain(0.18);const f=this._lpf(600);
+    [55,55.4,82.5,110].forEach(fr=>{this._osc(fr,'sine',0.25).connect(f);});
+    this._lfo(0.08,100,f.frequency);f.connect(g).connect(this.masterGain);
+  },
+
+  /* ── CACHOEIRA + CORAL SACRO ── */
+  waterfallChoral(){
+    // Cachoeira: ruído branco com filtragem ampla
+    const wSrc=this._noise(3,'white');
+    const wHp=this._hpf(300);
+    const wLp=this._lpf(5000,0.4);
+    const wG=this._gain(0.5);
+    this._lfo(0.18,1200,wLp.frequency); // variação natural
+    this._lfo(0.07,400,wHp.frequency);  // turbulência
+    wSrc.connect(wHp).connect(wLp).connect(wG).connect(this.masterGain);wSrc.start();this.nodes.push(wSrc);
+    // Rumble grave (base da queda)
+    const rSrc=this._noise(4,'brown');const rF=this._lpf(180);const rG=this._gain(0.35);
+    rSrc.connect(rF).connect(rG).connect(this.masterGain);rSrc.start();this.nodes.push(rSrc);
+    // Coral sacro suave por baixo — Ré menor
+    const notes=[{f:73.42,g:0.12},{f:110,g:0.10},{f:146.83,g:0.09},{f:174.61,g:0.08},{f:220,g:0.07}];
+    const padF=this._lpf(1800,0.3);const padG=this._gain(0.45);
+    const lfo=this.ctx.createOscillator();lfo.frequency.value=0.06;
+    const lfoG=this.ctx.createGain();lfoG.gain.value=300;
+    lfo.connect(lfoG).connect(padF.frequency);lfo.start();this.nodes.push(lfo,lfoG);
+    notes.forEach(n=>{
+      [0,0.4,-0.4].forEach(det=>{
+        const o=this.ctx.createOscillator();o.type='sine';o.frequency.value=n.f;o.detune.value=det;
+        const og=this.ctx.createGain();og.gain.value=n.g*0.35;
+        o.connect(og).connect(padF);o.start();this.nodes.push(o,og);
+      });
+    });
+    padF.connect(padG).connect(this.masterGain);
+  },
+
+  /* ── OCEANO + SINOS ── */
+  oceanBells(){
+    // Ondas — LFO lento modulando amplitude do ruído
+    const oSrc=this._noise(4,'pink');const oHp=this._hpf(80);const oLp=this._lpf(1200,0.5);
+    // Envelope de onda via LFO no gain
+    const waveGain=this.ctx.createGain();waveGain.gain.value=0.3;
+    const waveLfo=this.ctx.createOscillator();waveLfo.frequency.value=0.10;
+    const waveLfoG=this.ctx.createGain();waveLfoG.gain.value=0.22;
+    waveLfo.connect(waveLfoG).connect(waveGain.gain);waveLfo.start();
+    this.nodes.push(waveLfo,waveLfoG,waveGain);
+    oSrc.connect(oHp).connect(oLp).connect(waveGain).connect(this.masterGain);oSrc.start();this.nodes.push(oSrc);
+    // Grave profundo do oceano
+    const deepSrc=this._noise(4,'brown');const deepF=this._lpf(120);const deepG=this._gain(0.3);
+    this._lfo(0.05,60,deepF.frequency);
+    deepSrc.connect(deepF).connect(deepG).connect(this.masterGain);deepSrc.start();this.nodes.push(deepSrc);
+    // Pad harmônico (Lá menor)
+    const padNotes=[{f:55,g:0.08},{f:82.41,g:0.07},{f:110,g:0.07},{f:130.81,g:0.06}];
+    const padF=this._lpf(1200,0.4);const padG=this._gain(0.4);
+    padNotes.forEach(n=>{const o=this._osc(n.f,'sine',n.g);o.connect(padF);});
+    padF.connect(padG).connect(this.masterGain);
+    // Sinos esporádicos
+    const bFreqs=[523.25,659.25,783.99,1046.50,1318.51];
+    const ringBell=()=>{
+      if(this.currentSound!=='oceanBells')return;
+      const f=bFreqs[Math.floor(Math.random()*bFreqs.length)],now=this.ctx.currentTime;
+      const o1=this.ctx.createOscillator(),o2=this.ctx.createOscillator();
+      o1.type='sine';o1.frequency.value=f;o2.type='sine';o2.frequency.value=f*2.76;
+      const g=this.ctx.createGain();
+      g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(0.12,now+0.02);g.gain.exponentialRampToValueAtTime(0.001,now+5);
+      o1.connect(g);o2.connect(g);g.connect(this.masterGain);
+      o1.start(now);o2.start(now);o1.stop(now+5.5);o2.stop(now+5.5);
+      const tid=setTimeout(ringBell,10000+Math.random()*12000);
+      this.nodes.push({stop:()=>clearTimeout(tid),disconnect:()=>{}});
+    };
+    setTimeout(ringBell,3000);
+  },
+
+  /* ── FLORESTA SAGRADA ── */
+  sacredForest(){
+    // Vento suave — ruído filtrado modulado lentamente
+    const wSrc=this._noise(4,'pink');const wLp=this._lpf(800,0.5);const wHp=this._hpf(120);
+    const wG=this._gain(0.25);
+    this._lfo(0.08,400,wLp.frequency);this._lfo(0.13,0.08,wG.gain);
+    wSrc.connect(wHp).connect(wLp).connect(wG).connect(this.masterGain);wSrc.start();this.nodes.push(wSrc);
+    // Riacho — ruído médio com borbulhas
+    const rSrc=this._noise(3,'white');const rHp=this._hpf(600);const rLp=this._lpf(3000,0.6);
+    const rG=this._gain(0.28);
+    this._lfo(4,500,rLp.frequency);this._lfo(0.3,200,rLp.frequency);
+    rSrc.connect(rHp).connect(rLp).connect(rG).connect(this.masterGain);rSrc.start();this.nodes.push(rSrc);
+    // Pad natureza suave — Fá maior (pastoral)
+    const padNotes=[{f:87.31,g:0.06},{f:130.81,g:0.055},{f:174.61,g:0.05},{f:196,g:0.045}];
+    const padF=this._lpf(1000,0.3);const padG=this._gain(0.38);
+    this._lfo(0.05,200,padF.frequency);
+    padNotes.forEach(n=>{[0,0.3].forEach(d=>{const o=this.ctx.createOscillator();o.type='sine';o.frequency.value=n.f;o.detune.value=d;const og=this.ctx.createGain();og.gain.value=n.g;o.connect(og).connect(padF);o.start();this.nodes.push(o,og);});});
+    padF.connect(padG).connect(this.masterGain);
+    // Pássaros — chirps aleatórios curtos
+    const chirp=()=>{
+      if(this.currentSound!=='sacredForest')return;
+      const now=this.ctx.currentTime;
+      const baseFreq=2000+Math.random()*3000;
+      const o=this.ctx.createOscillator();o.type='sine';
+      o.frequency.setValueAtTime(baseFreq,now);
+      o.frequency.exponentialRampToValueAtTime(baseFreq*1.5,now+0.08);
+      o.frequency.exponentialRampToValueAtTime(baseFreq*0.8,now+0.15);
+      const g=this.ctx.createGain();
+      g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(0.06,now+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,now+0.18);
+      const f=this._bpf(baseFreq,8);
+      o.connect(f).connect(g).connect(this.masterGain);
+      o.start(now);o.stop(now+0.25);
+      // Às vezes dois chirps seguidos
+      if(Math.random()>0.5){
+        const o2=this.ctx.createOscillator();o2.type='sine';
+        const f2=baseFreq*1.2;o2.frequency.setValueAtTime(f2,now+0.22);
+        o2.frequency.exponentialRampToValueAtTime(f2*1.3,now+0.28);
+        const g2=this.ctx.createGain();
+        g2.gain.setValueAtTime(0,now+0.22);g2.gain.linearRampToValueAtTime(0.05,now+0.24);
+        g2.gain.exponentialRampToValueAtTime(0.001,now+0.35);
+        const f2f=this._bpf(f2,8);
+        o2.connect(f2f).connect(g2).connect(this.masterGain);
+        o2.start(now+0.22);o2.stop(now+0.4);
+      }
+      const tid=setTimeout(chirp,4000+Math.random()*8000);
+      this.nodes.push({stop:()=>clearTimeout(tid),disconnect:()=>{}});
+    };
+    setTimeout(chirp,2000);
+  },
+
+  /* ── CORAL SACRO ── */
+  choralPad(){
+    const mf=this._lpf(2200,0.4);const mg=this._gain(0.6);
+    const notes=[{f:110,g:0.18},{f:164.81,g:0.14},{f:220,g:0.16},{f:261.63,g:0.12},{f:329.63,g:0.10}];
+    this._lfo(0.07,400,mf.frequency);
+    notes.forEach(n=>{[0,0.5,-0.5].forEach(det=>{const o=this.ctx.createOscillator();o.type='sine';o.frequency.value=n.f;o.detune.value=det;const og=this.ctx.createGain();og.gain.value=n.g*0.4;o.connect(og).connect(mf);o.start();this.nodes.push(o,og);});});
+    mf.connect(mg).connect(this.masterGain);
+  },
+
+  /* ── ÓRGÃO ── */
+  organPad(){
+    const f=this._lpf(2000,0.5);const g=this._gain(0.4);
+    [110,164.81,220].forEach(fr=>{
+      [{m:0.5,l:0.25,t:'sine'},{m:1,l:0.35,t:'sine'},{m:2,l:0.20,t:'sine'},{m:3,l:0.10,t:'triangle'}].forEach(h=>{
+        const o=this.ctx.createOscillator();o.type=h.t;o.frequency.value=fr*h.m;const og=this.ctx.createGain();og.gain.value=h.l*0.18;o.connect(og).connect(f);o.start();this.nodes.push(o,og);
+      });
+    });
+    this._lfo(0.12,250,f.frequency);f.connect(g).connect(this.masterGain);
+  },
+
+  /* ── SINOS DISTANTES ── */
+  distantBells(){
+    const pf=this._lpf(1500);const pg=this._gain(0.3);
+    [110,220,329.63].forEach(fr=>{const o=this._osc(fr,'sine',0.06);o.connect(pf);});
+    pf.connect(pg).connect(this.masterGain);
+    const ring=()=>{
+      if(this.currentSound!=='bells')return;
+      const fr=[523.25,659.25,783.99,1046.50][Math.floor(Math.random()*4)],now=this.ctx.currentTime;
+      const o1=this.ctx.createOscillator(),o2=this.ctx.createOscillator();
+      o1.type='sine';o1.frequency.value=fr;o2.type='sine';o2.frequency.value=fr*2.76;
+      const g=this.ctx.createGain();
+      g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(0.14,now+0.02);g.gain.exponentialRampToValueAtTime(0.001,now+4);
+      o1.connect(g);o2.connect(g);g.connect(this.masterGain);
+      o1.start(now);o2.start(now);o1.stop(now+4.5);o2.stop(now+4.5);
+      const tid=setTimeout(ring,8000+Math.random()*10000);this.nodes.push({stop:()=>clearTimeout(tid),disconnect:()=>{}});
+    };
+    setTimeout(ring,2000);
+  }
+};
+
+/* ================================================================
+   POMODORO
+================================================================ */
+const POMO={FOCUS:25*60,SHORT:5*60,LONG:15*60,CYCLES:4};
+let pomoState={phase:'focus',remaining:POMO.FOCUS,isRunning:false,cycleIndex:0,endTime:null};
+let pomoInterval=null,prayerInterval=null;
+const TOTAL_DASH=578.05;
+
+async function savePomoState(){await storage.set('pomo',{phase:pomoState.phase,remaining:pomoState.remaining,isRunning:pomoState.isRunning,cycleIndex:pomoState.cycleIndex,endTime:pomoState.endTime});}
+
+async function loadPomoState(){
+  const s=await storage.get('pomo',null);if(!s)return;
+  if(s.isRunning&&s.endTime){
+    const nr=Math.max(0,Math.round((s.endTime-Date.now())/1000));
+    if(nr<=0){pomoState.phase=s.phase;pomoState.cycleIndex=s.cycleIndex;pomoState.remaining=0;pomoState.isRunning=false;handlePhaseEnd();return;}
+    pomoState={phase:s.phase,remaining:nr,isRunning:true,cycleIndex:s.cycleIndex,endTime:s.endTime};
+    pomoInterval=setInterval(pomoTick,250);
+    // Áudio inicia só no próximo gesto do usuário (política de autoplay)
+  }else{
+    pomoState={phase:s.phase,remaining:s.remaining,isRunning:false,cycleIndex:s.cycleIndex,endTime:null};
+  }
+}
+
+function updateTimerDisplay(){
+  const m=Math.floor(pomoState.remaining/60),s=pomoState.remaining%60;
+  document.getElementById('timeText').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  const total=pomoState.phase==='focus'?POMO.FOCUS:(pomoState.phase==='long'?POMO.LONG:POMO.SHORT);
+  document.getElementById('timeHint').textContent=pomoState.phase==='focus'?'Concentre-se':(pomoState.phase==='long'?'Pausa longa':'Hora de orar');
+  document.getElementById('timerProgress').setAttribute('stroke-dashoffset',TOTAL_DASH*(1-pomoState.remaining/total));
+  document.title=`${m}:${s.toString().padStart(2,'0')} · ${pomoState.phase==='focus'?'Foco':'Pausa'} · Foco e Terço`;
+  const pt=document.getElementById('prayerPomoTime');
+  if(pt&&document.getElementById('prayerScreen').classList.contains('active'))
+    pt.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function updatePomoUI(){
+  const card=document.getElementById('pomoCard');
+  card.classList.remove('break','long-break');
+  if(pomoState.phase==='focus'){
+    document.getElementById('phaseLabel').textContent='Foco';
+    document.getElementById('phaseSubtitle').textContent=pomoState.isRunning?'Concentre-se na sua tarefa':'Pronto para começar';
+  }else if(pomoState.phase==='short'){
+    card.classList.add('break');
+    document.getElementById('phaseLabel').textContent='Pausa Curta';
+    document.getElementById('phaseSubtitle').textContent=pomoState.isRunning?'Cinco minutos para descansar e rezar':'Dê o play para iniciar a pausa';
+  }else{
+    card.classList.add('break','long-break');
+    document.getElementById('phaseLabel').textContent='Pausa Longa';
+    document.getElementById('phaseSubtitle').textContent=pomoState.isRunning?'Quinze minutos — tempo de oração tranquila':'Dê o play para iniciar a pausa longa';
+  }
+  document.querySelectorAll('.pomo-dot').forEach((d,i)=>{d.classList.remove('done','current');if(i<pomoState.cycleIndex)d.classList.add('done');else if(i===pomoState.cycleIndex&&pomoState.phase==='focus')d.classList.add('current');});
+  document.getElementById('iconPlay').style.display=pomoState.isRunning?'none':'block';
+  document.getElementById('iconPause').style.display=pomoState.isRunning?'block':'none';
+  const cta=document.getElementById('breakCta');
+  if(pomoState.phase!=='focus'&&pomoState.isRunning)cta.classList.add('visible');else cta.classList.remove('visible');
+  updateTimerDisplay();
+}
+
+function startPomo(){
+  // Garantir que o AudioContext seja criado dentro do gesto do usuário
+  if(!Ambient.ctx)Ambient.init();
+  if(Ambient.ctx&&Ambient.ctx.state==='suspended')Ambient.ctx.resume();
+  pomoState.isRunning=true;pomoState.endTime=Date.now()+pomoState.remaining*1000;
+  if(pomoInterval)clearInterval(pomoInterval);pomoInterval=setInterval(pomoTick,250);
+  updatePomoUI();Ambient.play(pomoState.phase==='focus'?'focus':'prayer');savePomoState();
+}
+
+function pausePomo(){
+  pomoState.isRunning=false;if(pomoInterval)clearInterval(pomoInterval);pomoInterval=null;
+  updatePomoUI();Ambient.stop();savePomoState();
+}
+
+function pomoTick(){
+  if(!pomoState.isRunning)return;
+  const nr=Math.max(0,Math.round((pomoState.endTime-Date.now())/1000));
+  if(nr!==pomoState.remaining){pomoState.remaining=nr;updateTimerDisplay();}
+  if(pomoState.remaining<=0)handlePhaseEnd();
+}
+
+async function handlePhaseEnd(){
+  pomoState.isRunning=false;clearInterval(pomoInterval);pomoInterval=null;
+  const just=pomoState.phase;
+  if(just==='focus')await registerFocus();
+  if(just==='focus'){
+    const isLast=pomoState.cycleIndex>=POMO.CYCLES-1;
+    pomoState.phase=isLast?'long':'short';pomoState.remaining=isLast?POMO.LONG:POMO.SHORT;
+    playBell('break');notify('Foco concluído','Quando quiser, inicie a pausa para rezar o Terço.');showToast('Foco concluído — dê o play para a pausa');
+  }else{
+    if(just==='long')pomoState.cycleIndex=0;else pomoState.cycleIndex++;
+    pomoState.phase='focus';pomoState.remaining=POMO.FOCUS;
+    playBell('focus');notify('Pausa concluída','Quando quiser, inicie um novo foco.');showToast('Pausa concluída — dê o play para focar');
+  }
+  // Nunca inicia a próxima fase sozinho: o usuário sempre dá o play.
+  updatePomoUI();Ambient.stop();
+  pomoState.endTime=null;await savePomoState();
+}
+
+function resetPomo(){pausePomo();pomoState={phase:'focus',remaining:POMO.FOCUS,isRunning:false,cycleIndex:0,endTime:null};updatePomoUI();document.title='Foco e Terço';Ambient.stop();savePomoState();}
+function skipPhase(){if(pomoState.isRunning)pausePomo();pomoState.remaining=0;handlePhaseEnd();}
+
+async function registerFocus(){
+  const today=new Date().toDateString(),stats=await storage.get('daily_stats',{});
+  if(!stats[today])stats[today]={pomos:0,focus_min:0};
+  stats[today].pomos++;stats[today].focus_min+=POMO.FOCUS/60;
+  const cut=Date.now()-60*24*60*60*1000;Object.keys(stats).forEach(k=>{if(new Date(k).getTime()<cut)delete stats[k];});
+  await storage.set('daily_stats',stats);updateDailyStats(stats);
+}
+
+async function updateDailyStats(s){
+  s=s||(await storage.get('daily_stats',{}));
+  const t=s[new Date().toDateString()]||{pomos:0,focus_min:0};
+  document.getElementById('pomosToday').textContent=t.pomos;
+  const h=Math.floor(t.focus_min/60),m=t.focus_min%60;
+  document.getElementById('focusToday').textContent=h>0?`${h}h ${m}min`:`${m}min`;
+}
+
+/* ================================================================
+   SOM / NOTIFICAÇÕES
+================================================================ */
+let bellCtx=null;
+async function playBell(type){
+  const on=await storage.get('settings.sound',true);if(!on)return;
+  try{
+    if(!bellCtx)bellCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(bellCtx.state==='suspended')await bellCtx.resume();
+    const now=bellCtx.currentTime;
+    const freqs=type==='break'?[659.25,783.99,1046.50]:[523.25,659.25,783.99];
+    freqs.forEach((f,i)=>{
+      const o=bellCtx.createOscillator(),g=bellCtx.createGain();
+      o.connect(g);g.connect(bellCtx.destination);o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,now+i*0.15);g.gain.linearRampToValueAtTime(0.15,now+i*0.15+0.05);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*0.15+1.1);
+      o.start(now+i*0.15);o.stop(now+i*0.15+1.2);
+    });
+  }catch(e){}
+}
+
+async function playBeadTick(){
+  const on=await storage.get('settings.sound',true);if(!on)return;
+  try{
+    if(!bellCtx)bellCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(bellCtx.state==='suspended')await bellCtx.resume();
+    const now=bellCtx.currentTime;
+    const o=bellCtx.createOscillator(),f=bellCtx.createBiquadFilter(),g=bellCtx.createGain();
+    f.type='bandpass';f.frequency.value=1200;f.Q.value=8;o.type='triangle';
+    o.frequency.setValueAtTime(880,now);o.frequency.exponentialRampToValueAtTime(440,now+0.08);
+    g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(0.07,now+0.01);g.gain.exponentialRampToValueAtTime(0.001,now+0.15);
+    o.connect(f);f.connect(g);g.connect(bellCtx.destination);o.start(now);o.stop(now+0.2);
+  }catch(e){}
+}
+
+async function notify(title,body){
+  if(!await storage.get('settings.notif',false))return;
+  if(!('Notification'in window)||Notification.permission!=='granted')return;
+  try{new Notification(title,{body,silent:true});}catch(e){}
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+/* ================================================================
+   TEMA
+================================================================ */
+async function initTheme(){const s=await storage.get('theme',null);applyTheme(s||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));}
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('iconSun').style.display=t==='dark'?'block':'none';document.getElementById('iconMoon').style.display=t==='dark'?'none':'block';}
+async function toggleTheme(){const c=document.documentElement.getAttribute('data-theme')||'light';const n=c==='light'?'dark':'light';applyTheme(n);await storage.set('theme',n);}
+
+/* ================================================================
+   ROSÁRIO
+================================================================ */
+let currentSteps=[],currentStep=0,currentMystery=null,rosaryInProgress=false;
+
+async function loadRosaryState(){
+  const s=await storage.get('rosary',null),def=getTodayMystery();
+  if(s&&s.date===new Date().toDateString()&&s.key===def.key){
+    currentMystery=MYSTERIES[s.key];currentSteps=generateSteps(currentMystery);
+    currentStep=s.step||0;rosaryInProgress=currentStep>0&&currentStep<currentSteps.length-1;
+  }else{currentMystery=def;currentSteps=generateSteps(currentMystery);currentStep=0;rosaryInProgress=false;}
+}
+
+async function saveRosaryState(){await storage.set('rosary',{date:new Date().toDateString(),key:currentMystery.key,step:currentStep});}
+
+async function resetRosary(){
+  if(rosaryInProgress&&!confirm('Reiniciar o Terço do zero?'))return;
+  currentStep=0;rosaryInProgress=false;await saveRosaryState();updateRosaryUI();
+}
+
+function updateRosaryUI(){
+  const badge=document.getElementById('progressBadge');
+  if(rosaryInProgress){
+    badge.classList.add('in-progress');badge.querySelector('span').textContent=`${Math.round(currentStep/currentSteps.length*100)}% concluído`;
+    document.getElementById('btnPrayLabel').textContent='Continuar Terço';document.getElementById('btnResetRosary').style.display='';
+  }else{
+    badge.classList.remove('in-progress');badge.querySelector('span').textContent='Não iniciado';
+    document.getElementById('btnPrayLabel').textContent='Iniciar Terço';document.getElementById('btnResetRosary').style.display='none';
+  }
+}
+
+/* ================================================================
+   NAVEGAÇÃO
+================================================================ */
+function showScreen(id){
+  ['home','prayerScreen','completeScreen'].forEach(s=>{
+    const el=document.getElementById(s);const active=s===id;
+    el.style.display=active?'':'none';
+    if(active)el.classList.add('active');else el.classList.remove('active');
+  });
+}
+
+async function goHome(){showScreen('home');stopPrayerTick();await loadHome();updatePomoUI();}
+
+async function loadHome(){
+  const today=new Date();
+  document.getElementById('dateLine').textContent=`${DAYS_PT[today.getDay()]} · ${today.getDate()} de ${MONTHS_PT[today.getMonth()]}`;
+  await loadRosaryState();
+  document.getElementById('mysteryName').textContent=currentMystery.name;
+  document.getElementById('mysteryDay').textContent=currentMystery.days;
+  document.getElementById('mysteryList').innerHTML=currentMystery.items.map((it,i)=>`<li><span class="num">${i+1}º</span><span>${it}</span></li>`).join('');
+  updateRosaryUI();await updateDailyStats();updateLiturgicalBar();
+}
+
+function enterPrayer(){
+  // Garantir AudioContext dentro do gesto do usuário
+  if(!Ambient.ctx)Ambient.init();
+  if(Ambient.ctx&&Ambient.ctx.state==='suspended')Ambient.ctx.resume();
+  showScreen('prayerScreen');
+  const ind=document.getElementById('prayerPomoIndicator');
+  if(pomoState.isRunning){
+    ind.classList.remove('hidden');
+    const lbl=pomoState.phase==='focus'?'Foco':(pomoState.phase==='long'?'Pausa Longa':'Pausa');
+    document.getElementById('prayerPomoLabel').textContent=lbl;
+    const m=Math.floor(pomoState.remaining/60),s=pomoState.remaining%60;
+    document.getElementById('prayerPomoTime').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+    startPrayerTick();
+  }else{ind.classList.add('hidden');}
+  renderStep();
+  Ambient.play('prayer');
+}
+
+function startPrayerTick(){
+  if(prayerInterval)clearInterval(prayerInterval);
+  prayerInterval=setInterval(()=>{
+    const ind=document.getElementById('prayerPomoIndicator');
+    if(!pomoState.isRunning){if(ind)ind.classList.add('hidden');return;}
+    const lbl=pomoState.phase==='focus'?'Foco':(pomoState.phase==='long'?'Pausa Longa':'Pausa');
+    const lblEl=document.getElementById('prayerPomoLabel');if(lblEl)lblEl.textContent=lbl;
+    const m=Math.floor(pomoState.remaining/60),s=pomoState.remaining%60;
+    const el=document.getElementById('prayerPomoTime');if(el)el.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  },500);
+}
+
+function stopPrayerTick(){if(prayerInterval){clearInterval(prayerInterval);prayerInterval=null;}}
+
+function exitPrayer(){
+  saveRosaryState();goHome();
+  if(pomoState.isRunning)Ambient.play(pomoState.phase==='focus'?'focus':'prayer');else Ambient.stop();
+}
+
+/* ================================================================
+   RENDER PASSO
+================================================================ */
+function renderStep(){
+  const step=currentSteps[currentStep];if(!step)return;
+  document.getElementById('stepNum').textContent=currentStep+1;
+  document.getElementById('stepTotal').textContent=currentSteps.length;
+  document.getElementById('progressBar').style.setProperty('--progress',`${((currentStep+1)/currentSteps.length)*100}%`);
+  document.getElementById('rosaryVisual').innerHTML=buildRosarySVG(step.bead,getCompletedBeads(currentSteps,currentStep));
+  const isLast=currentStep===currentSteps.length-1;
+  let html=`<div class="prayer-phase">${step.phase}</div><h2 class="prayer-title">${step.title}</h2>`;
+  if(step.meditation)html+=`<div class="prayer-meditation">${step.meditation}</div>`;
+  html+=`<div class="prayer-text">${step.text}</div>`;
+  if(step.title==='Ave-Maria'&&typeof step.aveIndex==='number'){
+    let dots='';for(let i=0;i<10;i++){let c='ave-dot';if(i<step.aveIndex)c+=' filled';else if(i===step.aveIndex)c+=' current';dots+=`<div class="${c}"></div>`;}
+    html+=`<div class="ave-counter">${dots}<span class="ave-label">${step.aveIndex+1}/10</span></div>`;
+  }
+  html+=`<div class="controls">
+    <button class="btn-nav" onclick="prevStep()" ${currentStep===0?'disabled':''}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Voltar
+    </button>
+    <div class="controls-group">
+      <button class="btn-nav" onclick="pauseHere()">Pausar Aqui</button>
+      <button class="btn-nav btn-next" onclick="nextStep()">
+        ${isLast?'Concluir':'Próximo'}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>`;
+  document.getElementById('prayerCard').innerHTML=html;
+}
+
+function nextStep(){if(currentStep<currentSteps.length-1){currentStep++;rosaryInProgress=true;saveRosaryState();playBeadTick();renderStep();}else completePrayer();}
+function prevStep(){if(currentStep>0){currentStep--;rosaryInProgress=currentStep>0;saveRosaryState();renderStep();}}
+function pauseHere(){rosaryInProgress=currentStep>0;saveRosaryState();showToast('Posição salva');setTimeout(()=>goHome(),700);}
+
+async function completePrayer(){
+  const h=await storage.get('history',[]);
+  h.unshift({date:new Date().toISOString(),mysteryKey:currentMystery.key,mysteryName:currentMystery.name});
+  if(h.length>100)h.length=100;
+  await storage.set('history',h);currentStep=0;rosaryInProgress=false;await saveRosaryState();
+  showScreen('completeScreen');window.scrollTo({top:0,behavior:'smooth'});Ambient.stop();
+}
+
+/* ================================================================
+   HISTÓRICO
+================================================================ */
+async function openHistory(){
+  const h=await storage.get('history',[]),body=document.getElementById('historyBody');
+  if(!h.length){body.innerHTML=`<div class="history-empty">Você ainda não completou nenhum terço.<br>Que tal começar agora?</div>`;document.getElementById('historyModal').classList.add('active');return;}
+  const today=new Date();today.setHours(0,0,0,0);
+  const dates=new Set(h.map(x=>{const d=new Date(x.date);d.setHours(0,0,0,0);return d.getTime();}));
+  let streak=0,check=new Date(today);
+  while(dates.has(check.getTime())){streak++;check.setDate(check.getDate()-1);}
+  if(!streak){check=new Date(today);check.setDate(check.getDate()-1);while(dates.has(check.getTime())){streak++;check.setDate(check.getDate()-1);}}
+  const ms=new Date(today.getFullYear(),today.getMonth(),1),tm=h.filter(x=>new Date(x.date)>=ms).length;
+  let out=`<div class="history-stats"><div class="stat"><div class="stat-num">${h.length}</div><div class="stat-label">Total</div></div><div class="stat"><div class="stat-num">${tm}</div><div class="stat-label">Este Mês</div></div><div class="stat"><div class="stat-num">${streak}</div><div class="stat-label">Sequência</div></div></div><ul class="history-list">`;
+  h.slice(0,30).forEach(x=>{const d=new Date(x.date);out+=`<li class="history-item"><div><div class="history-date">${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}</div><div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">${DAYS_PT[d.getDay()]} · ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</div></div><div class="history-mystery">${x.mysteryName}</div></li>`;});
+  out+=`</ul>`;body.innerHTML=out;document.getElementById('historyModal').classList.add('active');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('active');}
+
+/* ================================================================
+   CONFIGURAÇÕES
+================================================================ */
+async function loadSettings(){
+  const sound=await storage.get('settings.sound',true),notif=await storage.get('settings.notif',false);
+  const ambient=await storage.get('settings.ambient',true);
+  const fs=await storage.get('settings.focusSound','brown'),ps=await storage.get('settings.prayerSound','waterfallChoral');
+  const vol=await storage.get('settings.volume',30);
+  document.getElementById('toggleSound').classList.toggle('active',sound);
+  document.getElementById('toggleNotif').classList.toggle('active',notif);
+  document.getElementById('toggleAmbient').classList.toggle('active',ambient);
+  document.getElementById('selectFocus').value=fs;
+  document.getElementById('selectPrayer').value=ps;
+  document.getElementById('volumeSlider').value=vol;
+  Ambient.enabled=ambient;Ambient.focusSound=fs;Ambient.prayerSound=ps;Ambient.volume=vol/100;
+  const ytF=await storage.get('settings.ytFocus',''),ytP=await storage.get('settings.ytPrayer','');
+  Ambient.ytUrls.focus=ytF;Ambient.ytUrls.prayer=ytP;
+  const ytFEl=document.getElementById('ytFocusUrl'),ytPEl=document.getElementById('ytPrayerUrl');
+  if(ytFEl)ytFEl.value=ytF;if(ytPEl)ytPEl.value=ytP;
+  const warn=document.getElementById('ytFileWarning');
+  if(warn){
+    if(Ambient.isBlockedEnv()){warn.style.display='block';warn.innerHTML='⚠️ '+Ambient.blockedReason();}
+    else warn.style.display='none';
+  }
+  updateSoundDesc('focus',fs);updateSoundDesc('prayer',ps);
+}
+
+function updateSoundDesc(type,val){
+  const el=document.getElementById(`desc${type==='focus'?'Focus':'Prayer'}`);
+  if(!el)return;
+  const d=SOUND_DESCS[val]||'';
+  el.textContent=d;el.classList.toggle('visible',val!=='off'&&d!=='—'&&d!=='');
+}
+
+async function toggleSetting(k){
+  const ids={sound:'toggleSound',notif:'toggleNotif',ambient:'toggleAmbient'};
+  const el=document.getElementById(ids[k]),next=!el.classList.contains('active');
+  el.classList.toggle('active',next);await storage.set(`settings.${k}`,next);
+  if(k==='notif'&&next&&'Notification'in window&&Notification.permission==='default'){
+    const p=await Notification.requestPermission();
+    if(p!=='granted'){el.classList.remove('active');await storage.set('settings.notif',false);showToast('Permissão negada');}
+  }
+  if(k==='ambient'){
+    Ambient.enabled=next;
+    if(next){await Ambient.init();if(pomoState.isRunning)Ambient.play(pomoState.phase==='focus'?'focus':'prayer');else if(document.getElementById('prayerScreen').classList.contains('active'))Ambient.play('prayer');}
+    else Ambient.stop();
+  }
+}
+
+async function onSoundChange(type,val){
+  if(type==='focus'){Ambient.focusSound=val;await storage.set('settings.focusSound',val);}
+  else{Ambient.prayerSound=val;await storage.set('settings.prayerSound',val);}
+  updateSoundDesc(type,val);
+  if(val==='youtube'&&!Ambient.isBlockedEnv())Ambient.loadYouTubeApi();
+  if(Ambient.currentType===type){Ambient.currentSound=null;Ambient.play(type);}
+}
+
+async function onYtUrlInput(type,val){
+  Ambient.ytUrls[type]=val.trim();
+  await storage.set(type==='focus'?'settings.ytFocus':'settings.ytPrayer',val.trim());
+  // se este tipo está tocando via youtube, recarrega o vídeo
+  const sound=type==='focus'?Ambient.focusSound:Ambient.prayerSound;
+  if(Ambient.currentType===type&&sound==='youtube'){Ambient.currentSound=null;Ambient.play(type);}
+}
+
+async function setVolume(v){Ambient.setVolume(parseInt(v,10)/100);await storage.set('settings.volume',parseInt(v,10));}
+
+/* ================================================================
+   MODO
+================================================================ */
+let currentMode='full';
+async function setMode(m){
+  currentMode=m;document.body.setAttribute('data-mode',m);
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===m));
+  await storage.set('mode',m);if(m==='prayer'&&pomoState.isRunning)pausePomo();
+}
+async function loadMode(){const s=await storage.get('mode','full');currentMode=s;document.body.setAttribute('data-mode',s);document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===s));}
+
+/* ================================================================
+   LITÚRGICO
+================================================================ */
+function updateLiturgicalBar(){
+  const info=getLiturgicalInfo();
+  document.getElementById('liturgicalSeason').textContent=info.seasonName;
+  document.getElementById('liturgicalBar').style.setProperty('--season-color',info.color);
+  let html='';
+  if(info.feast)html+=`<span class="feast">★ ${info.feast}</span>`;
+  else html+=`<em>${DAYS_PT[new Date().getDay()]}</em>`;
+  document.getElementById('liturgicalInfo').innerHTML=html;
+}
+
+/* ================================================================
+   ONBOARDING
+================================================================ */
+const OB=[
+  {icon:`<svg viewBox="0 0 80 80" fill="currentColor"><circle cx="40" cy="40" r="32" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="40" cy="20" r="3"/><path d="M40 40v-20" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="40" cy="40" r="4"/></svg>`,title:'Bem-vindo ao Foco e Terço',text:'Un aplicativo que une a técnica Pomodoro à oração do Santo Terço, transformando seus momentos de pausa em encontro com Deus.'},
+  {icon:`<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2"><circle cx="40" cy="40" r="32"/><path d="M40 22v18l12 6"/><circle cx="40" cy="40" r="2.5" fill="currentColor"/></svg>`,title:'Como funciona',text:'Trabalhe 25 minutos com foco total. Quando o sino tocar, dedique 5 minutos para rezar uma parte do Terço. A cada 4 ciclos, pausa longa de 15 minutos.'},
+  {icon:`<svg viewBox="0 0 80 80" fill="currentColor"><circle cx="40" cy="20" r="4"/><circle cx="25" cy="32" r="2.5" opacity="0.7"/><circle cx="55" cy="32" r="2.5" opacity="0.7"/><circle cx="40" cy="65" r="3.5"/><path d="M40 24v10M25 34l5 5M55 34l-5 5M40 44v15" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`,title:'Sons para Oração',text:'Seis ambientes sonoros gerados no próprio dispositivo: Cachoeira, Oceano, Floresta Sagrada, Coral, Órgão e Sinos — sem internet, sem YouTube.'}
+];
+let obIdx=0;
+
+function showOnboarding(){obIdx=0;document.getElementById('onboardingOverlay').classList.add('active');renderOB();}
+function renderOB(){
+  const s=OB[obIdx];
+  document.getElementById('onboardingIcon').innerHTML=s.icon;
+  document.getElementById('onboardingStep').textContent=`Passo ${obIdx+1} de ${OB.length}`;
+  document.getElementById('onboardingTitle').textContent=s.title;
+  document.getElementById('onboardingText').textContent=s.text;
+  document.querySelectorAll('.onboarding-dot').forEach((d,i)=>d.classList.toggle('active',i===obIdx));
+  const isLast=obIdx===OB.length-1;
+  document.getElementById('onboardingNext').innerHTML=isLast
+    ?`Começar <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>`
+    :`Próximo <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>`;
+}
+function nextOnboardingStep(){if(obIdx<OB.length-1){obIdx++;renderOB();}else finishOnboarding();}
+async function finishOnboarding(){document.getElementById('onboardingOverlay').classList.remove('active');await storage.set('onboarding_done',true);}
+async function checkOnboarding(){if(!await storage.get('onboarding_done',false))showOnboarding();}
+
+async function loadStoredAudio(){
+  for(const type of['focus','prayer']){
+    try{
+      const s=await storage.get('audio_'+type,null);
+      if(s&&s.data){Ambient.customAudio[type]=_createAudio(s.data);_setUploadUI(type,s.name,true);}
+    }catch(e){}
+  }
+}
+
+/* ================================================================
+   EVENTOS
+================================================================ */
+document.getElementById('themeBtn').addEventListener('click',toggleTheme);
+document.getElementById('historyBtn').addEventListener('click',openHistory);
+document.getElementById('settingsBtn').addEventListener('click',()=>document.getElementById('settingsModal').classList.add('active'));
+document.getElementById('btnStart').addEventListener('click',()=>{if(pomoState.isRunning)pausePomo();else startPomo();});
+document.getElementById('btnReset').addEventListener('click',()=>{if(confirm('Reiniciar o Pomodoro?'))resetPomo();});
+document.getElementById('btnSkip').addEventListener('click',()=>{if(confirm('Pular para a próxima fase?'))skipPhase();});
+['historyModal','settingsModal'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);}));
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('prayerScreen').classList.contains('active')){
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nextStep();}
+    else if(e.key==='ArrowLeft'){e.preventDefault();prevStep();}
+  }
+  if(e.key==='Escape'){closeModal('historyModal');closeModal('settingsModal');}
+});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pomoState.isRunning)pomoTick();});
+
+/* ================================================================
+   BOOT
+================================================================ */
+/* ================================================================
+   FUNÇÕES DE ÁUDIO PERSONALIZADO
+================================================================ */
+function _createAudio(dataUrl){
+  const a=new Audio(dataUrl);a.loop=true;a.volume=Ambient.volume;return a;
+}
+
+function _setUploadUI(type,name,saved){
+  const nEl=document.getElementById(type==='focus'?'focusFileName':'prayerFileName');
+  const rBtn=document.getElementById(type==='focus'?'focusRemoveBtn':'prayerRemoveBtn');
+  if(nEl)nEl.textContent=name?(saved?'💾 ':'')+name.substring(0,38)+(name.length>38?'…':''):'Nenhum arquivo';
+  if(rBtn)rBtn.style.display=saved?'block':'none';
+}
+
+async function handleAudioUpload(type,file){
+  if(!file)return;
+  showToast('Carregando…');
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const data=e.target.result;
+    const old=Ambient.customAudio[type];if(old)old.pause();
+    Ambient.customAudio[type]=_createAudio(data);
+    let saved=false;
+    try{await storage.set('audio_'+type,{name:file.name,data});saved=true;showToast('💾 Salvo: '+file.name.substring(0,28));}
+    catch(err){showToast('Arquivo só nesta sessão (muito grande)');}
+    _setUploadUI(type,file.name,saved);
+    if(Ambient.currentType===type&&Ambient.currentSound==='custom'){Ambient.currentSound=null;Ambient.play(type);}
+  };
+  reader.onerror=()=>showToast('Erro ao ler arquivo');
+  reader.readAsDataURL(file);
+}
+
+async function removeStoredAudio(type){
+  if(!confirm('Remover o áudio salvo?'))return;
+  try{await storage.set('audio_'+type,null);}catch(e){}
+  const old=Ambient.customAudio[type];if(old){old.pause();old.src='';}
+  Ambient.customAudio[type]=null;
+  _setUploadUI(type,null,false);
+  if(Ambient.currentType===type&&Ambient.currentSound==='custom')Ambient.stop();
+  showToast('Áudio removido');
+}
+
+async function loadStoredAudio(){
+  for(const type of['focus','prayer']){
+    try{
+      const s=await storage.get('audio_'+type,null);
+      if(s&&s.data){Ambient.customAudio[type]=_createAudio(s.data);_setUploadUI(type,s.name,true);}
+    }catch(e){}
+  }
+}
+
+async function pickAudioFile(type){
+  try{
+    if('showOpenFilePicker' in window){
+      const [h]=await window.showOpenFilePicker({
+        types:[{description:'Áudio',accept:{'audio/*':['.mp3','.ogg','.wav','.m4a','.aac']}}],
+        multiple:false
+      });
+      handleAudioUpload(type,await h.getFile());
+      return;
+    }
+  }catch(e){if(e.name==='AbortError')return;}
+  const inp=document.getElementById(type+'FileInput');
+  if(inp){inp.value='';inp.click();}
+}
+
+/* ================================================================
+   BOOT
+================================================================ */
+(async()=>{
+  await initTheme();await loadSettings();await loadMode();await loadPomoState();await loadStoredAudio();await loadHome();updatePomoUI();await checkOnboarding();
+})();
+</script>
+</body>
+</html>
