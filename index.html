@@ -268,19 +268,6 @@
     border-left:2px solid var(--marian-light);line-height:1.5;}
   .sound-desc.visible{display:block;}
 
-  /* Upload de áudio */
-  .upload-wrap{display:none;margin-top:0.85rem;}
-  .upload-wrap.visible{display:block;}
-  .upload-area{border:2px dashed var(--border);border-radius:3px;padding:1.1rem;text-align:center;
-    cursor:pointer;transition:all 0.3s;background:transparent;user-select:none;}
-  .upload-area:hover{border-color:var(--marian);background:rgba(91,125,177,0.05);}
-  .upload-area.has-file{border-color:var(--gold);background:rgba(184,148,90,0.05);}
-  .upload-icon{font-size:1.4rem;margin-bottom:0.35rem;}
-  .upload-name{font-size:0.88rem;color:var(--text-soft);word-break:break-all;line-height:1.4;}
-  .upload-hint{font-size:0.72rem;color:var(--text-muted);margin-top:0.3rem;font-family:'DM Mono',monospace;letter-spacing:0.08em;}
-  .upload-sources{margin-top:0.5rem;font-size:0.83rem;color:var(--text-muted);font-style:italic;line-height:1.6;}
-  .upload-sources strong{color:var(--gold);font-style:normal;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
-
   /* BEADS */
   .bead{fill:var(--rosary-bead);stroke:var(--rosary-chain);stroke-width:0.5;transition:all 0.5s;}
   .bead.large{fill:var(--rosary-bead-large);}
@@ -549,7 +536,6 @@
           <option value="river">🏞️ Rio Tranquilo</option>
           <option value="drone">🔉 Drone Grave</option>
           <option value="youtube">▶️ YouTube (link próprio)</option>
-          <option value="custom">📁 Arquivo próprio (som real)</option>
           <option value="off">— Sem som</option>
         </select>
         <div class="sound-desc" id="descFocus"></div>
@@ -565,38 +551,9 @@
           <option value="organ">🎹 Órgão Contemplativo</option>
           <option value="bells">🔔 Sinos Distantes</option>
           <option value="youtube">▶️ YouTube (link próprio)</option>
-          <option value="custom">📁 Arquivo próprio (som real)</option>
           <option value="off">— Sem som</option>
         </select>
         <div class="sound-desc" id="descPrayer"></div>
-      </div>
-
-      <div class="settings-divider"><span>Seus arquivos de áudio</span></div>
-
-      <div class="settings-row block-row">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:0.75rem;">
-          <div>
-            <div style="font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-soft);margin-bottom:0.4rem;">Para Foco</div>
-            <div id="focusFileName" style="font-size:0.8rem;color:var(--text-muted);font-style:italic;margin-bottom:0.6rem;min-height:1.1em;word-break:break-all;line-height:1.4;">Nenhum arquivo</div>
-            <button onclick="pickAudioFile('focus')" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.75rem 0.5rem;background:var(--marian-deep);color:#f7f4ed;border:none;border-radius:2px;font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">
-              📂 Escolher MP3
-            </button>
-            <input type="file" id="focusFileInput" accept="audio/*" style="display:none;" onchange="handleAudioUpload('focus',this.files[0])">
-            <button id="focusRemoveBtn" onclick="removeStoredAudio('focus')" style="display:none;width:100%;margin-top:0.4rem;padding:0.4rem;background:transparent;border:1px dashed rgba(184,148,90,0.4);border-radius:2px;color:var(--gold);font-size:0.65rem;font-family:'Cinzel',serif;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;">✕ Remover</button>
-          </div>
-          <div>
-            <div style="font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-soft);margin-bottom:0.4rem;">Para Oração</div>
-            <div id="prayerFileName" style="font-size:0.8rem;color:var(--text-muted);font-style:italic;margin-bottom:0.6rem;min-height:1.1em;word-break:break-all;line-height:1.4;">Nenhum arquivo</div>
-            <button onclick="pickAudioFile('prayer')" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.75rem 0.5rem;background:var(--marian-deep);color:#f7f4ed;border:none;border-radius:2px;font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">
-              📂 Escolher MP3
-            </button>
-            <input type="file" id="prayerFileInput" accept="audio/*" style="display:none;" onchange="handleAudioUpload('prayer',this.files[0])">
-            <button id="prayerRemoveBtn" onclick="removeStoredAudio('prayer')" style="display:none;width:100%;margin-top:0.4rem;padding:0.4rem;background:transparent;border:1px dashed rgba(184,148,90,0.4);border-radius:2px;color:var(--gold);font-size:0.65rem;font-family:'Cinzel',serif;letter-spacing:0.1em;cursor:pointer;text-transform:uppercase;">✕ Remover</button>
-          </div>
-        </div>
-        <div style="font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.5;border-top:1px dashed var(--border);padding-top:0.6rem;">
-          Usado quando o dropdown acima está em <strong style="color:var(--text-soft);font-style:normal;">"Arquivo próprio"</strong>. Sons gratuitos: <span style="color:var(--gold);cursor:pointer;text-decoration:underline;" onclick="window.open('https://freesound.org','_blank')">freesound.org</span>
-        </div>
       </div>
 
       <div class="settings-divider"><span>YouTube</span></div>
@@ -673,7 +630,7 @@ const PRAYERS={
   avemaria:`Ave Maria, cheia de graça,\no Senhor é convosco,\nbendita sois Vós entre as mulheres\ne bendito é o fruto do Vosso ventre, Jesus.\n\nSanta Maria, Mãe de Deus,\nrogai por nós, pecadores,\nagora e na hora da nossa morte.\n\nAmém.`,
   gloria:`Glória ao Pai, ao Filho\ne ao Espírito Santo.\nComo era no princípio,\nagora e sempre.\n\nAmém.`,
   fatima:`Ó meu Jesus,\nperdoai-nos,\nlivrai-nos do fogo do inferno,\nlevai as almas todas para o Céu\ne socorrei principalmente\nas que mais precisarem.\n\nAmém.`,
-  thanks:`Infinitas graças vos damos,\nSoberana Rainha,\npelos benefícios que todos os dias\nrecebemos de vossa mão liberais.\nDignai-vos, agora e para sempre,\ntomar-nos debaixo do vosso poderoso amparo.`,
+  thanks:`Infinitas graças vos damos,\nSoberana Rainha,\npelos benefícios que todos os dias\nrecebemos de vossa mão liberais.\nDignai-vos, agora e para sempre,\ntomar-nos debaixo do vosso poderoso amparo\ne, para mais vos obrigar,\nvos saudamos com uma Salve Rainha.`,
   salve:`Salve Rainha, Mãe de Misericórdia,\nvida, doçura, esperança nossa, salve!\nA Vós bradamos, os degredados filhos de Eva;\na Vós suspiramos, gemendo e chorando\nneste vale de lágrimas.\n\nEia, pois, advogada nossa,\nesses Vossos olhos misericordiosos a nós volvei,\ne depois deste desterro nos mostrai a Jesus,\nbendito fruto do Vosso ventre,\nó clemente, ó piedosa, ó doce\nsempre Virgem Maria.\n\nV. Rogai por nós, Santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n\nAmém.`
 };
 
@@ -701,7 +658,6 @@ const SOUND_DESCS={
   pad:'Vozes corais sintéticas em harmonia de ré menor — intimidade com o sagrado.',
   organ:'Harmônicos de órgão de catedral — solenidade e reverência.',
   bells:'Sinos esporádicos com drone suave — cada toque convida à atenção.',
-  custom:'Arquivo de áudio do seu computador — som real gravado.',
   off:'—'
 };
 
@@ -822,7 +778,6 @@ const Ambient={
   enabled:true,focusSound:'brown',prayerSound:'waterfallChoral',
   currentType:null,currentSound:null,volume:0.3,
   FADE:1.2,
-  customAudio:{focus:null,prayer:null},
   ytUrls:{focus:'',prayer:''},
   yt:null,ytReady:false,ytPending:null,ytApiLoading:false,
 
@@ -835,12 +790,11 @@ const Ambient={
 
   setVolume(v){
     this.volume=v;
-    if(this.masterGain&&this.ctx&&this.currentType&&this.currentSound!=='custom'){
+    if(this.masterGain&&this.ctx&&this.currentType){
       const n=this.ctx.currentTime;this.masterGain.gain.cancelScheduledValues(n);
       this.masterGain.gain.setValueAtTime(this.masterGain.gain.value,n);
       this.masterGain.gain.linearRampToValueAtTime(v,n+0.3);
     }
-    ['focus','prayer'].forEach(t=>{if(this.customAudio[t])this.customAudio[t].volume=v;});
     if(this.currentSound==='youtube')this.applyYTVolume();
   },
 
@@ -855,11 +809,6 @@ const Ambient={
   },
 
   stopNodes(){this.nodes.forEach(n=>{try{if(n.stop)n.stop();}catch(e){}try{if(n.disconnect)n.disconnect();}catch(e){}});this.nodes=[];},
-
-  stopCustom(type){
-    const a=type?[this.customAudio[type]]:[this.customAudio.focus,this.customAudio.prayer];
-    a.forEach(au=>{if(au&&!au.paused){au.pause();au.currentTime=0;}});
-  },
 
   /* ── YouTube IFrame ── */
   isFileProtocol(){return location.protocol==='file:';},
@@ -935,8 +884,7 @@ const Ambient={
     const id=this.parseYouTubeId(this.ytUrls[type]);
     if(!id){showToast('Cole um link válido do YouTube nas configurações');return false;}
     // para qualquer outra fonte
-    this.stopCustom();this.stopNodes();
-    if(this.currentType&&this.currentSound!=='youtube'&&this.currentSound!=='custom'){/* fadeOut já não aplicável */}
+    this.stopNodes();
     this.currentType=type;this.currentSound='youtube';
     if(!window.YT||!window.YT.Player||!this.yt||!this.ytReady){
       this.ytPending={type,id};
@@ -986,30 +934,12 @@ const Ambient={
 
     if(sound==='youtube'){
       // para Web Audio se tocando
-      if(this.currentType&&this.currentSound!=='youtube'&&this.currentSound!=='custom'){this.fadeOut();}
-      this.stopCustom();
+      if(this.currentType&&this.currentSound!=='youtube'){this.fadeOut();}
       this.startYouTube(type);
       return;
     }
     // saindo do youtube para outra fonte
     if(this.currentSound==='youtube'){this.stopYouTube();this.currentType=null;this.currentSound=null;}
-
-    if(sound==='custom'){
-      const au=this.customAudio[type];
-      if(!au){showToast('Nenhum arquivo carregado — escolha um nas configurações');return;}
-      // Para Web Audio se estava tocando
-      if(this.currentType&&this.currentSound!=='custom'){this.fadeOut();}else{this.stopNodes();}
-      // Para o áudio custom do outro tipo se estiver tocando
-      const other=type==='focus'?'prayer':'focus';
-      this.stopCustom(other);
-      this.currentType=type;this.currentSound='custom';
-      au.volume=this.volume;au.loop=true;
-      au.play().catch(e=>showToast('Erro ao reproduzir — recarregue o arquivo'));
-      this.updateIndicator();return;
-    }
-
-    // Se estava tocando custom, para
-    if(this.currentSound==='custom'){this.stopCustom();this.currentType=null;this.currentSound=null;}
 
     await this.init();await this.resume();if(!this.ctx)return;
     if(this.currentType===type&&this.currentSound===sound)return;
@@ -1020,8 +950,6 @@ const Ambient={
   stop(){
     if(this.currentSound==='youtube'){
       this.stopYouTube();this.currentType=null;this.currentSound=null;this.updateIndicator();
-    }else if(this.currentSound==='custom'){
-      this.stopCustom();this.currentType=null;this.currentSound=null;this.updateIndicator();
     }else if(this.currentType){
       this.fadeOut(()=>this.updateIndicator());
     }else{this.stopNodes();this.currentType=null;this.currentSound=null;this.updateIndicator();}
@@ -1037,7 +965,7 @@ const Ambient={
     if(!el)return;
     if(this.currentType&&this.enabled){
       el.classList.add('visible');
-      const names={brown:'foco',rain:'chuva',river:'rio',drone:'drone',waterfallChoral:'cachoeira',oceanBells:'oceano',sacredForest:'floresta',pad:'coral',organ:'órgão',bells:'sinos',custom:'arquivo',youtube:'youtube'};
+      const names={brown:'foco',rain:'chuva',river:'rio',drone:'drone',waterfallChoral:'cachoeira',oceanBells:'oceano',sacredForest:'floresta',pad:'coral',organ:'órgão',bells:'sinos',youtube:'youtube'};
       if(lbl)lbl.textContent=names[this.currentSound]||'som';
     }else el.classList.remove('visible');
   },
@@ -1251,6 +1179,7 @@ const Ambient={
 const POMO={FOCUS:25*60,SHORT:5*60,LONG:15*60,CYCLES:4};
 let pomoState={phase:'focus',remaining:POMO.FOCUS,isRunning:false,cycleIndex:0,endTime:null};
 let pomoInterval=null,prayerInterval=null;
+let phaseEnding=false;
 const TOTAL_DASH=578.05;
 
 async function savePomoState(){await storage.set('pomo',{phase:pomoState.phase,remaining:pomoState.remaining,isRunning:pomoState.isRunning,cycleIndex:pomoState.cycleIndex,endTime:pomoState.endTime});}
@@ -1327,23 +1256,40 @@ function pomoTick(){
 }
 
 async function handlePhaseEnd(){
-  pomoState.isRunning=false;clearInterval(pomoInterval);pomoInterval=null;
+  if(phaseEnding)return; // evita processar o fim da fase duas vezes (ex.: ao voltar de segundo plano)
+  phaseEnding=true;
+  pomoState.isRunning=false;
+  if(pomoInterval){clearInterval(pomoInterval);pomoInterval=null;}
   const just=pomoState.phase;
-  if(just==='focus')await registerFocus();
+  const wasOnPrayerScreen=document.getElementById('prayerScreen').style.display!=='none';
+
   if(just==='focus'){
     const isLast=pomoState.cycleIndex>=POMO.CYCLES-1;
     pomoState.phase=isLast?'long':'short';pomoState.remaining=isLast?POMO.LONG:POMO.SHORT;
-    playBell('break');notify('Foco concluído','Quando quiser, inicie a pausa para rezar o Terço.');showToast('Foco concluído — dê o play para a pausa');
   }else{
     if(just==='long')pomoState.cycleIndex=0;else pomoState.cycleIndex++;
     pomoState.phase='focus';pomoState.remaining=POMO.FOCUS;
-    playBell('focus');notify('Pausa concluída','Quando quiser, inicie um novo foco.');showToast('Pausa concluída — dê o play para focar');
-    // Ao terminar o terço, volta para a janela de foco (parada, aguardando o play)
-    if(document.getElementById('prayerScreen').style.display!=='none')await goHome();
   }
-  // Nunca inicia a próxima fase sozinho: o usuário sempre dá o play.
-  updatePomoUI();Ambient.stop();
-  pomoState.endTime=null;await savePomoState();
+  pomoState.endTime=null;
+
+  // Atualiza a interface e para o áudio JÁ, antes de qualquer operação assíncrona
+  // (armazenamento etc.) que possa demorar quando o app volta de segundo plano —
+  // é isso que evita o ícone de pause/música travados ao voltar para a aba.
+  Ambient.stop();
+  if(just!=='focus'&&wasOnPrayerScreen){
+    // Ao terminar o terço, volta para a janela de foco (parada, aguardando o play)
+    showScreen('home');stopPrayerTick();
+  }
+  updatePomoUI();
+
+  if(just==='focus'){playBell('break');notify('Foco concluído','Quando quiser, inicie a pausa para rezar o Terço.');showToast('Foco concluído — dê o play para a pausa');}
+  else{playBell('focus');notify('Pausa concluída','Quando quiser, inicie um novo foco.');showToast('Pausa concluída — dê o play para focar');}
+
+  // Persistência — não precisa bloquear a interface, que já foi atualizada acima
+  if(just==='focus')registerFocus();
+  if(just!=='focus'&&wasOnPrayerScreen)loadHome();
+  await savePomoState();
+  phaseEnding=false;
 }
 
 function resetPomo(){pausePomo();pomoState={phase:'focus',remaining:POMO.FOCUS,isRunning:false,cycleIndex:0,endTime:null};updatePomoUI();document.title='Foco e Terço';Ambient.stop();savePomoState();}
@@ -1578,7 +1524,9 @@ function closeModal(id){document.getElementById(id).classList.remove('active');}
 async function loadSettings(){
   const sound=await storage.get('settings.sound',true),notif=await storage.get('settings.notif',false);
   const ambient=await storage.get('settings.ambient',true);
-  const fs=await storage.get('settings.focusSound','brown'),ps=await storage.get('settings.prayerSound','waterfallChoral');
+  let fs=await storage.get('settings.focusSound','brown'),ps=await storage.get('settings.prayerSound','waterfallChoral');
+  if(fs==='custom'){fs='brown';await storage.set('settings.focusSound',fs);}
+  if(ps==='custom'){ps='waterfallChoral';await storage.set('settings.prayerSound',ps);}
   const vol=await storage.get('settings.volume',30);
   document.getElementById('toggleSound').classList.toggle('active',sound);
   document.getElementById('toggleNotif').classList.toggle('active',notif);
@@ -1690,15 +1638,6 @@ function nextOnboardingStep(){if(obIdx<OB.length-1){obIdx++;renderOB();}else fin
 async function finishOnboarding(){document.getElementById('onboardingOverlay').classList.remove('active');await storage.set('onboarding_done',true);}
 async function checkOnboarding(){if(!await storage.get('onboarding_done',false))showOnboarding();}
 
-async function loadStoredAudio(){
-  for(const type of['focus','prayer']){
-    try{
-      const s=await storage.get('audio_'+type,null);
-      if(s&&s.data){Ambient.customAudio[type]=_createAudio(s.data);_setUploadUI(type,s.name,true);}
-    }catch(e){}
-  }
-}
-
 /* ================================================================
    EVENTOS
 ================================================================ */
@@ -1716,82 +1655,19 @@ document.addEventListener('keydown',e=>{
   }
   if(e.key==='Escape'){closeModal('historyModal');closeModal('settingsModal');}
 });
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&pomoState.isRunning)pomoTick();});
-
-/* ================================================================
-   BOOT
-================================================================ */
-/* ================================================================
-   FUNÇÕES DE ÁUDIO PERSONALIZADO
-================================================================ */
-function _createAudio(dataUrl){
-  const a=new Audio(dataUrl);a.loop=true;a.volume=Ambient.volume;return a;
-}
-
-function _setUploadUI(type,name,saved){
-  const nEl=document.getElementById(type==='focus'?'focusFileName':'prayerFileName');
-  const rBtn=document.getElementById(type==='focus'?'focusRemoveBtn':'prayerRemoveBtn');
-  if(nEl)nEl.textContent=name?(saved?'💾 ':'')+name.substring(0,38)+(name.length>38?'…':''):'Nenhum arquivo';
-  if(rBtn)rBtn.style.display=saved?'block':'none';
-}
-
-async function handleAudioUpload(type,file){
-  if(!file)return;
-  showToast('Carregando…');
-  const reader=new FileReader();
-  reader.onload=async e=>{
-    const data=e.target.result;
-    const old=Ambient.customAudio[type];if(old)old.pause();
-    Ambient.customAudio[type]=_createAudio(data);
-    let saved=false;
-    try{await storage.set('audio_'+type,{name:file.name,data});saved=true;showToast('💾 Salvo: '+file.name.substring(0,28));}
-    catch(err){showToast('Arquivo só nesta sessão (muito grande)');}
-    _setUploadUI(type,file.name,saved);
-    if(Ambient.currentType===type&&Ambient.currentSound==='custom'){Ambient.currentSound=null;Ambient.play(type);}
-  };
-  reader.onerror=()=>showToast('Erro ao ler arquivo');
-  reader.readAsDataURL(file);
-}
-
-async function removeStoredAudio(type){
-  if(!confirm('Remover o áudio salvo?'))return;
-  try{await storage.set('audio_'+type,null);}catch(e){}
-  const old=Ambient.customAudio[type];if(old){old.pause();old.src='';}
-  Ambient.customAudio[type]=null;
-  _setUploadUI(type,null,false);
-  if(Ambient.currentType===type&&Ambient.currentSound==='custom')Ambient.stop();
-  showToast('Áudio removido');
-}
-
-async function loadStoredAudio(){
-  for(const type of['focus','prayer']){
-    try{
-      const s=await storage.get('audio_'+type,null);
-      if(s&&s.data){Ambient.customAudio[type]=_createAudio(s.data);_setUploadUI(type,s.name,true);}
-    }catch(e){}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&pomoState.isRunning){
+    if(pomoInterval)clearInterval(pomoInterval);
+    pomoInterval=setInterval(pomoTick,250);
+    pomoTick();
   }
-}
-
-async function pickAudioFile(type){
-  try{
-    if('showOpenFilePicker' in window){
-      const [h]=await window.showOpenFilePicker({
-        types:[{description:'Áudio',accept:{'audio/*':['.mp3','.ogg','.wav','.m4a','.aac']}}],
-        multiple:false
-      });
-      handleAudioUpload(type,await h.getFile());
-      return;
-    }
-  }catch(e){if(e.name==='AbortError')return;}
-  const inp=document.getElementById(type+'FileInput');
-  if(inp){inp.value='';inp.click();}
-}
+});
 
 /* ================================================================
    BOOT
 ================================================================ */
 (async()=>{
-  await initTheme();await loadSettings();await loadMode();await loadPomoState();await loadStoredAudio();await loadHome();updatePomoUI();await checkOnboarding();
+  await initTheme();await loadSettings();await loadMode();await loadPomoState();await loadHome();updatePomoUI();await checkOnboarding();
 })();
 </script>
 </body>
