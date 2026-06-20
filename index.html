@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Foco e Terço · Pomodoro com Oração</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c4a6e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Foco e Terço">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png" type="image/png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@300;400;500&display=swap');
 
@@ -82,6 +91,20 @@
   .mode-tab:hover{color:var(--marian);}
   .mode-tab.active{background:var(--marian-deep);color:#f7f4ed;}
   [data-theme="dark"] .mode-tab.active{background:var(--marian);color:#0c1426;}
+
+  .prayer-mode-tabs{display:flex;gap:0.4rem;margin-bottom:1.25rem;}
+  .prayer-mode-tab{flex:1;padding:0.55rem 0.75rem;background:transparent;border:1px solid var(--border);
+    border-radius:999px;color:var(--text-muted);font-family:'Cinzel',serif;font-size:0.64rem;
+    letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;text-align:center;}
+  .prayer-mode-tab:hover{color:var(--gold);border-color:var(--gold);}
+  .prayer-mode-tab.active{background:var(--gold);border-color:var(--gold);color:#fff;}
+
+  .streak-badge{display:inline-flex;align-items:center;gap:0.35rem;}
+  .streak-badge .flame{filter:grayscale(0);opacity:0.9;}
+
+  .wakelock-indicator{display:none;align-items:center;justify-content:center;gap:5px;font-size:0.7rem;color:var(--text-muted);
+    font-family:'DM Mono',monospace;letter-spacing:0.05em;margin-top:1rem;width:100%;}
+  .wakelock-indicator.visible{display:flex;}
 
   .pomodoro-card{background:var(--surface);backdrop-filter:blur(20px);border:1px solid var(--border);
     border-radius:4px;padding:2.5rem 2rem;box-shadow:var(--shadow-soft);position:relative;
@@ -364,13 +387,15 @@
     <div class="greeting-bar">
       <div class="date-line" id="dateLine"></div>
       <div class="daily-stats">
+        <span class="streak-badge" id="streakBadge" style="display:none;"><span class="flame">🔥</span> <strong id="streakCount">0</strong> dias seguidos</span>
+        <span id="streakSep">·</span>
         <span><strong id="pomosToday">0</strong> pomodoros</span>
         <span>·</span>
         <span><strong id="focusToday">0min</strong> focado</span>
       </div>
     </div>
 
-    <div class="liturgical-bar">
+    <div class="liturgical-bar" id="liturgicalBar">
       <div class="liturgical-season">
         <span class="liturgical-color" id="liturgicalColor"></span>
         <span id="liturgicalSeason">Tempo Comum</span>
@@ -422,6 +447,10 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </button>
       </div>
+      <div class="wakelock-indicator" id="wakeLockIndicator" title="A tela é mantida ligada enquanto o cronômetro roda">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Tela ativa
+      </div>
     </div>
 
     <div class="break-cta" id="breakCta">
@@ -434,9 +463,13 @@
     </div>
 
     <div class="mystery-card">
+      <div class="prayer-mode-tabs" id="prayerModeTabs">
+        <button class="prayer-mode-tab active" data-pmode="rosary" onclick="setPrayerMode('rosary')">Terço Mariano</button>
+        <button class="prayer-mode-tab" data-pmode="mercy" onclick="setPrayerMode('mercy')">Terço da Misericórdia</button>
+      </div>
       <div class="mystery-header">
         <div>
-          <div class="mystery-label">Mistério de Hoje</div>
+          <div class="mystery-label" id="mysteryLabel">Mistério de Hoje</div>
           <div class="mystery-name" id="mysteryName"></div>
           <div class="mystery-day" id="mysteryDay"></div>
         </div>
@@ -483,6 +516,9 @@
     </div>
     <h2>Terço Completado</h2>
     <p>Que Nossa Senhora interceda por suas intenções. Que a paz de Cristo permaneça em seu coração.</p>
+    <div class="streak-badge" id="completeStreakBadge" style="display:none;justify-content:center;margin:-1rem 0 2rem;font-family:'Cinzel',serif;font-size:0.85rem;letter-spacing:0.1em;color:var(--gold);text-transform:uppercase;">
+      <span class="flame">🔥</span> <span id="completeStreakText"></span>
+    </div>
     <div class="complete-actions">
       <button class="btn-primary" onclick="goHome()">Voltar ao Início</button>
       <button class="btn-ghost" onclick="openHistory()">Ver Histórico</button>
@@ -593,6 +629,33 @@
           Pausa longa: <strong style="color:var(--marian);">15 min</strong> (após 4 pomodoros)
         </div>
       </div>
+
+      <div class="settings-divider"><span>Backup</span></div>
+      <div class="settings-row block-row">
+        <div class="settings-hint" style="font-style:normal;margin-bottom:0.75rem;">
+          Suas configurações, terço e estatísticas ficam salvos só neste navegador. Exporte um backup para não perder nada ao trocar de aparelho ou navegador.
+        </div>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+          <button class="btn-ghost" onclick="exportBackup()" style="flex:1;justify-content:center;min-width:140px;">⬇️ Exportar backup</button>
+          <button class="btn-ghost" onclick="document.getElementById('backupFileInput').click()" style="flex:1;justify-content:center;min-width:140px;">⬆️ Importar backup</button>
+        </div>
+        <input type="file" id="backupFileInput" accept="application/json" style="display:none;" onchange="importBackupFile(this.files[0])">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <h3 id="confirmTitle">Confirmar</h3>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage" style="font-size:1.05rem;line-height:1.6;margin-bottom:1.75rem;color:var(--text-soft);"></p>
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+        <button class="btn-ghost" id="confirmCancelBtn">Cancelar</button>
+        <button class="btn-primary" id="confirmOkBtn">Confirmar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -631,7 +694,10 @@ const PRAYERS={
   gloria:`Glória ao Pai, ao Filho\ne ao Espírito Santo.\nComo era no princípio,\nagora e sempre.\n\nAmém.`,
   fatima:`Ó meu Jesus,\nperdoai-nos,\nlivrai-nos do fogo do inferno,\nlevai as almas todas para o Céu\ne socorrei principalmente\nas que mais precisarem.\n\nAmém.`,
   thanks:`Infinitas graças vos damos,\nSoberana Rainha,\npelos benefícios que todos os dias\nrecebemos de vossa mão liberais.\nDignai-vos, agora e para sempre,\ntomar-nos debaixo do vosso poderoso amparo\ne, para mais vos obrigar,\nvos saudamos com uma Salve Rainha.`,
-  salve:`Salve Rainha, Mãe de Misericórdia,\nvida, doçura, esperança nossa, salve!\nA Vós bradamos, os degredados filhos de Eva;\na Vós suspiramos, gemendo e chorando\nneste vale de lágrimas.\n\nEia, pois, advogada nossa,\nesses Vossos olhos misericordiosos a nós volvei,\ne depois deste desterro nos mostrai a Jesus,\nbendito fruto do Vosso ventre,\nó clemente, ó piedosa, ó doce\nsempre Virgem Maria.\n\nV. Rogai por nós, Santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n\nAmém.`
+  salve:`Salve Rainha, Mãe de Misericórdia,\nvida, doçura, esperança nossa, salve!\nA Vós bradamos, os degredados filhos de Eva;\na Vós suspiramos, gemendo e chorando\nneste vale de lágrimas.\n\nEia, pois, advogada nossa,\nesses Vossos olhos misericordiosos a nós volvei,\ne depois deste desterro nos mostrai a Jesus,\nbendito fruto do Vosso ventre,\nó clemente, ó piedosa, ó doce\nsempre Virgem Maria.\n\nV. Rogai por nós, Santa Mãe de Deus.\nR. Para que sejamos dignos das promessas de Cristo.\n\nAmém.`,
+  mercyOffering:`Eterno Pai,\neu Vos ofereço o Corpo e Sangue,\nalma e Divindade de Vosso diletíssimo Filho,\nNosso Senhor Jesus Cristo,\nem expiação dos nossos pecados\ne do mundo inteiro.`,
+  mercyDecade:`Pela Sua dolorosa Paixão,\ntende misericórdia de nós\ne do mundo inteiro.`,
+  mercyClosing:`Deus Santo,\nDeus Forte,\nDeus Imortal,\ntende piedade de nós\ne do mundo inteiro.`
 };
 
 const MYSTERIES={
@@ -719,6 +785,38 @@ function generateSteps(mystery){
   }
   steps.push({phase:'Encerramento',title:'Oração de Agradecimento',meditation:'Ao final das 5 dezenas',text:PRAYERS.thanks,bead:'closing'});
   steps.push({phase:'Encerramento',title:'Salve Rainha',meditation:'',text:PRAYERS.salve,bead:'closing'});
+  return steps;
+}
+
+/* ================================================================
+   TERÇO DA MISERICÓRDIA
+================================================================ */
+const MERCY_INFO={
+  key:'mercy',
+  name:'Terço da Misericórdia',
+  days:'Pode ser rezado todos os dias — tradicionalmente às 15h',
+  items:[
+    'Sinal da Cruz, Pai Nosso, Ave-Maria e Credo',
+    'Na conta grande de cada dezena: "Eterno Pai, eu Vos ofereço..."',
+    'Nas 10 contas pequenas: "Pela Sua dolorosa Paixão, tende misericórdia de nós..."',
+    'Encerramento: 3x "Deus Santo, Deus Forte, Deus Imortal..."'
+  ]
+};
+
+function generateMercySteps(){
+  const steps=[];
+  steps.push({phase:'Início',title:'Sinal da Cruz',meditation:'',text:PRAYERS.sign,bead:'cross'});
+  steps.push({phase:'Início',title:'Pai Nosso',meditation:'Segurando a primeira conta.',text:PRAYERS.paternoster,bead:'intro-pn'});
+  steps.push({phase:'Início',title:'Ave-Maria',meditation:'',text:PRAYERS.avemaria,bead:'intro-ave-0'});
+  steps.push({phase:'Início',title:'Credo',meditation:'Segurando o crucifixo.',text:PRAYERS.credo,bead:'cross'});
+  for(let d=0;d<5;d++){
+    const n=['1ª','2ª','3ª','4ª','5ª'][d];
+    steps.push({phase:`${n} Dezena`,title:'Oferecimento ao Eterno Pai',meditation:'Na conta grande',text:PRAYERS.mercyOffering,bead:`decade-${d}-pn`});
+    for(let a=0;a<10;a++)steps.push({phase:`${n} Dezena`,title:`Pela Sua Paixão (${a+1}/10)`,meditation:'',text:PRAYERS.mercyDecade,bead:`decade-${d}-ave-${a}`,aveIndex:a,decadeIndex:d});
+  }
+  steps.push({phase:'Encerramento',title:'Deus Santo (1/3)',meditation:'',text:PRAYERS.mercyClosing,bead:'closing'});
+  steps.push({phase:'Encerramento',title:'Deus Santo (2/3)',meditation:'',text:PRAYERS.mercyClosing,bead:'closing'});
+  steps.push({phase:'Encerramento',title:'Deus Santo (3/3)',meditation:'',text:PRAYERS.mercyClosing,bead:'closing'});
   return steps;
 }
 
@@ -962,6 +1060,7 @@ const Ambient={
 
   updateIndicator(){
     const el=document.getElementById('soundIndicator'),lbl=document.getElementById('soundIndicatorLabel');
+    if(typeof updateMediaSession==='function')updateMediaSession();
     if(!el)return;
     if(this.currentType&&this.enabled){
       el.classList.add('visible');
@@ -1232,6 +1331,62 @@ function updatePomoUI(){
   updateTimerDisplay();
 }
 
+/* ================================================================
+   WAKE LOCK (mantém a tela ligada durante foco/oração)
+================================================================ */
+let wakeLockObj=null;
+async function requestWakeLock(){
+  if(!('wakeLock'in navigator))return;
+  try{
+    wakeLockObj=await navigator.wakeLock.request('screen');
+    wakeLockObj.addEventListener('release',()=>updateWakeLockIndicator(false));
+    updateWakeLockIndicator(true);
+  }catch(e){updateWakeLockIndicator(false);}
+}
+function releaseWakeLock(){
+  if(wakeLockObj){try{wakeLockObj.release();}catch(e){}wakeLockObj=null;}
+  updateWakeLockIndicator(false);
+}
+function updateWakeLockIndicator(on){
+  const el=document.getElementById('wakeLockIndicator');
+  if(el)el.classList.toggle('visible',!!on);
+}
+
+/* ================================================================
+   MEDIA SESSION (controles de mídia na tela de bloqueio)
+================================================================ */
+function setupMediaSession(){
+  if(!('mediaSession'in navigator))return;
+  try{
+    navigator.mediaSession.setActionHandler('play',()=>{
+      if(pomoState.isRunning)return;
+      if(document.getElementById('prayerScreen').classList.contains('active'))Ambient.play('prayer');
+      else startPomo();
+    });
+    navigator.mediaSession.setActionHandler('pause',()=>{
+      if(pomoState.isRunning){pausePomo();return;}
+      Ambient.stop();
+    });
+  }catch(e){}
+}
+function updateMediaSession(){
+  if(!('mediaSession'in navigator))return;
+  try{
+    if(Ambient.currentType){
+      const isFocus=Ambient.currentType==='focus';
+      const title=isFocus?(pomoState.phase==='focus'?'Foco':'Pausa'):'Oração · '+(currentMystery?currentMystery.name:'Terço');
+      navigator.mediaSession.metadata=new MediaMetadata({
+        title,artist:'Foco e Terço',
+        album:isFocus?'Sessão de foco':'Momento de oração',
+        artwork:[{src:'icon-192.png',sizes:'192x192',type:'image/png'},{src:'icon-512.png',sizes:'512x512',type:'image/png'}]
+      });
+      navigator.mediaSession.playbackState='playing';
+    }else{
+      navigator.mediaSession.playbackState='paused';
+    }
+  }catch(e){}
+}
+
 function startPomo(){
   // Garantir que o AudioContext seja criado dentro do gesto do usuário
   if(!Ambient.ctx)Ambient.init();
@@ -1239,6 +1394,8 @@ function startPomo(){
   pomoState.isRunning=true;pomoState.endTime=Date.now()+pomoState.remaining*1000;
   if(pomoInterval)clearInterval(pomoInterval);pomoInterval=setInterval(pomoTick,250);
   updatePomoUI();Ambient.play(pomoState.phase==='focus'?'focus':'prayer');savePomoState();
+  requestWakeLock();
+  updateMediaSession();
   // Ao iniciar a pausa, abre a janela do terço e continua de onde parou
   if(pomoState.phase!=='focus')enterPrayer();
 }
@@ -1246,6 +1403,8 @@ function startPomo(){
 function pausePomo(){
   pomoState.isRunning=false;if(pomoInterval)clearInterval(pomoInterval);pomoInterval=null;
   updatePomoUI();Ambient.stop();savePomoState();
+  releaseWakeLock();
+  updateMediaSession();
 }
 
 function pomoTick(){
@@ -1276,11 +1435,13 @@ async function handlePhaseEnd(){
   // (armazenamento etc.) que possa demorar quando o app volta de segundo plano —
   // é isso que evita o ícone de pause/música travados ao voltar para a aba.
   Ambient.stop();
+  releaseWakeLock();
   if(just!=='focus'&&wasOnPrayerScreen){
     // Ao terminar o terço, volta para a janela de foco (parada, aguardando o play)
     showScreen('home');stopPrayerTick();
   }
   updatePomoUI();
+  updateMediaSession();
 
   if(just==='focus'){playBell('break');notify('Foco concluído','Quando quiser, inicie a pausa para rezar o Terço.');showToast('Foco concluído — dê o play para a pausa');}
   else{playBell('focus');notify('Pausa concluída','Quando quiser, inicie um novo foco.');showToast('Pausa concluída — dê o play para focar');}
@@ -1368,19 +1529,37 @@ async function toggleTheme(){const c=document.documentElement.getAttribute('data
    ROSÁRIO
 ================================================================ */
 let currentSteps=[],currentStep=0,currentMystery=null,rosaryInProgress=false;
+let prayerMode='rosary'; // 'rosary' | 'mercy'
 
 async function loadRosaryState(){
-  const s=await storage.get('rosary',null),def=getTodayMystery();
-  if(s&&s.date===new Date().toDateString()&&s.key===def.key){
-    currentMystery=MYSTERIES[s.key];currentSteps=generateSteps(currentMystery);
-    currentStep=s.step||0;rosaryInProgress=currentStep>0&&currentStep<currentSteps.length-1;
-  }else{currentMystery=def;currentSteps=generateSteps(currentMystery);currentStep=0;rosaryInProgress=false;}
+  prayerMode=await storage.get('prayerMode','rosary');
+  const s=await storage.get('rosary',null);
+  if(prayerMode==='mercy'){
+    currentMystery=MERCY_INFO;currentSteps=generateMercySteps();
+    if(s&&s.date===new Date().toDateString()&&s.mode==='mercy'){
+      currentStep=s.step||0;rosaryInProgress=currentStep>0&&currentStep<currentSteps.length-1;
+    }else{currentStep=0;rosaryInProgress=false;}
+  }else{
+    const def=getTodayMystery();
+    if(s&&s.date===new Date().toDateString()&&s.mode!=='mercy'&&s.key===def.key){
+      currentMystery=MYSTERIES[s.key];currentSteps=generateSteps(currentMystery);
+      currentStep=s.step||0;rosaryInProgress=currentStep>0&&currentStep<currentSteps.length-1;
+    }else{currentMystery=def;currentSteps=generateSteps(currentMystery);currentStep=0;rosaryInProgress=false;}
+  }
 }
 
-async function saveRosaryState(){await storage.set('rosary',{date:new Date().toDateString(),key:currentMystery.key,step:currentStep});}
+async function saveRosaryState(){await storage.set('rosary',{date:new Date().toDateString(),mode:prayerMode,key:currentMystery.key,step:currentStep});}
+
+async function setPrayerMode(m){
+  if(m===prayerMode)return;
+  if(rosaryInProgress&&!(await showConfirm('Trocar o tipo de terço reinicia o progresso de hoje. Deseja continuar?')))return;
+  prayerMode=m;await storage.set('prayerMode',m);
+  document.querySelectorAll('.prayer-mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.pmode===m));
+  await loadHome();
+}
 
 async function resetRosary(){
-  if(rosaryInProgress&&!confirm('Reiniciar o Terço do zero?'))return;
+  if(rosaryInProgress&&!(await showConfirm('Reiniciar o Terço do zero?')))return;
   currentStep=0;rosaryInProgress=false;await saveRosaryState();updateRosaryUI();
 }
 
@@ -1406,16 +1585,18 @@ function showScreen(id){
   });
 }
 
-async function goHome(){showScreen('home');stopPrayerTick();await loadHome();updatePomoUI();}
+async function goHome(){showScreen('home');stopPrayerTick();if(!pomoState.isRunning)releaseWakeLock();await loadHome();updatePomoUI();}
 
 async function loadHome(){
   const today=new Date();
   document.getElementById('dateLine').textContent=`${DAYS_PT[today.getDay()]} · ${today.getDate()} de ${MONTHS_PT[today.getMonth()]}`;
   await loadRosaryState();
+  document.querySelectorAll('.prayer-mode-tab').forEach(t=>t.classList.toggle('active',t.dataset.pmode===prayerMode));
+  document.getElementById('mysteryLabel').textContent=prayerMode==='mercy'?'Terço da Misericórdia':'Mistério de Hoje';
   document.getElementById('mysteryName').textContent=currentMystery.name;
   document.getElementById('mysteryDay').textContent=currentMystery.days;
   document.getElementById('mysteryList').innerHTML=currentMystery.items.map((it,i)=>`<li><span class="num">${i+1}º</span><span>${it}</span></li>`).join('');
-  updateRosaryUI();await updateDailyStats();updateLiturgicalBar();
+  updateRosaryUI();await updateDailyStats();updateLiturgicalBar();await updateStreakUI();
 }
 
 function enterPrayer(){
@@ -1423,6 +1604,7 @@ function enterPrayer(){
   if(!Ambient.ctx)Ambient.init();
   if(Ambient.ctx&&Ambient.ctx.state==='suspended')Ambient.ctx.resume();
   showScreen('prayerScreen');
+  requestWakeLock(); // mantém a tela ligada também ao rezar fora do Pomodoro
   const ind=document.getElementById('prayerPomoIndicator');
   if(pomoState.isRunning){
     ind.classList.remove('hidden');
@@ -1468,7 +1650,7 @@ function renderStep(){
   let html=`<div class="prayer-phase">${step.phase}</div><h2 class="prayer-title">${step.title}</h2>`;
   if(step.meditation)html+=`<div class="prayer-meditation">${step.meditation}</div>`;
   html+=`<div class="prayer-text">${step.text}</div>`;
-  if(step.title==='Ave-Maria'&&typeof step.aveIndex==='number'){
+  if(typeof step.aveIndex==='number'){
     let dots='';for(let i=0;i<10;i++){let c='ave-dot';if(i<step.aveIndex)c+=' filled';else if(i===step.aveIndex)c+=' current';dots+=`<div class="${c}"></div>`;}
     html+=`<div class="ave-counter">${dots}<span class="ave-label">${step.aveIndex+1}/10</span></div>`;
   }
@@ -1496,7 +1678,38 @@ async function completePrayer(){
   h.unshift({date:new Date().toISOString(),mysteryKey:currentMystery.key,mysteryName:currentMystery.name});
   if(h.length>100)h.length=100;
   await storage.set('history',h);currentStep=0;rosaryInProgress=false;await saveRosaryState();
+  const streakCount=await registerStreakDay();
+  const csBadge=document.getElementById('completeStreakBadge'),csText=document.getElementById('completeStreakText');
+  if(streakCount>1){
+    csText.textContent=`${streakCount} dias seguidos rezando`;csBadge.style.display='flex';
+  }else if(csBadge){csBadge.style.display='none';}
+  await updateStreakUI();
   showScreen('completeScreen');window.scrollTo({top:0,behavior:'smooth'});Ambient.stop();
+}
+
+/* ================================================================
+   SEQUÊNCIA DE DIAS (STREAK)
+================================================================ */
+async function registerStreakDay(){
+  const today=new Date().toDateString();
+  const data=await storage.get('streak',{count:0,lastDate:null});
+  if(data.lastDate===today)return data.count;
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  const count=data.lastDate===yesterday?data.count+1:1;
+  await storage.set('streak',{count,lastDate:today});
+  return count;
+}
+
+async function updateStreakUI(){
+  const data=await storage.get('streak',{count:0,lastDate:null});
+  const badge=document.getElementById('streakBadge'),sep=document.getElementById('streakSep');
+  if(!badge)return;
+  if(data.count>0){
+    document.getElementById('streakCount').textContent=data.count;
+    badge.style.display='inline-flex';if(sep)sep.style.display='';
+  }else{
+    badge.style.display='none';if(sep)sep.style.display='none';
+  }
 }
 
 /* ================================================================
@@ -1506,10 +1719,8 @@ async function openHistory(){
   const h=await storage.get('history',[]),body=document.getElementById('historyBody');
   if(!h.length){body.innerHTML=`<div class="history-empty">Você ainda não completou nenhum terço.<br>Que tal começar agora?</div>`;document.getElementById('historyModal').classList.add('active');return;}
   const today=new Date();today.setHours(0,0,0,0);
-  const dates=new Set(h.map(x=>{const d=new Date(x.date);d.setHours(0,0,0,0);return d.getTime();}));
-  let streak=0,check=new Date(today);
-  while(dates.has(check.getTime())){streak++;check.setDate(check.getDate()-1);}
-  if(!streak){check=new Date(today);check.setDate(check.getDate()-1);while(dates.has(check.getTime())){streak++;check.setDate(check.getDate()-1);}}
+  const streakData=await storage.get('streak',{count:0,lastDate:null});
+  const streak=streakData.count||0;
   const ms=new Date(today.getFullYear(),today.getMonth(),1),tm=h.filter(x=>new Date(x.date)>=ms).length;
   let out=`<div class="history-stats"><div class="stat"><div class="stat-num">${h.length}</div><div class="stat-label">Total</div></div><div class="stat"><div class="stat-num">${tm}</div><div class="stat-label">Este Mês</div></div><div class="stat"><div class="stat-num">${streak}</div><div class="stat-label">Sequência</div></div></div><ul class="history-list">`;
   h.slice(0,30).forEach(x=>{const d=new Date(x.date);out+=`<li class="history-item"><div><div class="history-date">${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}</div><div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem;">${DAYS_PT[d.getDay()]} · ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</div></div><div class="history-mystery">${x.mysteryName}</div></li>`;});
@@ -1517,6 +1728,26 @@ async function openHistory(){
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('active');}
+
+/* ================================================================
+   MODAL DE CONFIRMAÇÃO (substitui o confirm() nativo do navegador)
+================================================================ */
+let confirmResolver=null;
+function showConfirm(message,title){
+  return new Promise(resolve=>{
+    confirmResolver=resolve;
+    document.getElementById('confirmTitle').textContent=title||'Confirmar';
+    document.getElementById('confirmMessage').textContent=message;
+    document.getElementById('confirmModal').classList.add('active');
+  });
+}
+function resolveConfirm(val){
+  document.getElementById('confirmModal').classList.remove('active');
+  if(confirmResolver){const r=confirmResolver;confirmResolver=null;r(val);}
+}
+document.getElementById('confirmOkBtn').addEventListener('click',()=>resolveConfirm(true));
+document.getElementById('confirmCancelBtn').addEventListener('click',()=>resolveConfirm(false));
+document.getElementById('confirmModal').addEventListener('click',e=>{if(e.target.id==='confirmModal')resolveConfirm(false);});
 
 /* ================================================================
    CONFIGURAÇÕES
@@ -1588,6 +1819,57 @@ async function onYtUrlInput(type,val){
 async function setVolume(v){Ambient.setVolume(parseInt(v,10)/100);await storage.set('settings.volume',parseInt(v,10));}
 
 /* ================================================================
+   BACKUP (exportar / importar)
+================================================================ */
+async function exportBackup(){
+  const data={};
+  try{
+    if(window.storage&&typeof window.storage.list==='function'){
+      const r=await window.storage.list('');
+      if(r&&r.keys){
+        for(const k of r.keys){
+          try{const item=await window.storage.get(k);if(item)data[k]=JSON.parse(item.value);}catch(e){}
+        }
+      }
+    }
+  }catch(e){}
+  if(Object.keys(data).length===0){
+    // Ambiente padrão (app publicado): lê direto do localStorage deste navegador
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      try{data[k]=JSON.parse(localStorage.getItem(k));}catch(e){data[k]=localStorage.getItem(k);}
+    }
+  }
+  if(Object.keys(data).length===0){showToast('Nada para exportar ainda');return;}
+  const payload={app:'foco-e-terco',exportedAt:new Date().toISOString(),data};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`foco-e-terco-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast('💾 Backup exportado');
+}
+
+async function importBackupFile(file){
+  if(!file)return;
+  const ok=await showConfirm('Importar este backup substitui as configurações, o terço, o histórico e a sequência de dias atuais por eles. Deseja continuar?','Importar backup');
+  if(!ok){const inp=document.getElementById('backupFileInput');if(inp)inp.value='';return;}
+  try{
+    const text=await file.text();
+    const payload=JSON.parse(text);
+    const data=payload&&payload.data?payload.data:payload;
+    const keys=Object.keys(data);
+    if(!keys.length)throw new Error('vazio');
+    for(const k of keys)await storage.set(k,data[k]);
+    showToast('✅ Backup importado — recarregando…');
+    setTimeout(()=>location.reload(),900);
+  }catch(e){
+    showToast('Arquivo de backup inválido');
+  }
+}
+
+/* ================================================================
    MODO
 ================================================================ */
 let currentMode='full';
@@ -1645,28 +1927,36 @@ document.getElementById('themeBtn').addEventListener('click',toggleTheme);
 document.getElementById('historyBtn').addEventListener('click',openHistory);
 document.getElementById('settingsBtn').addEventListener('click',()=>document.getElementById('settingsModal').classList.add('active'));
 document.getElementById('btnStart').addEventListener('click',()=>{if(pomoState.isRunning)pausePomo();else startPomo();});
-document.getElementById('btnReset').addEventListener('click',()=>{if(confirm('Reiniciar o Pomodoro?'))resetPomo();});
-document.getElementById('btnSkip').addEventListener('click',()=>{if(confirm('Pular para a próxima fase?'))skipPhase();});
+document.getElementById('btnReset').addEventListener('click',async()=>{if(await showConfirm('Reiniciar o Pomodoro?'))resetPomo();});
+document.getElementById('btnSkip').addEventListener('click',async()=>{if(await showConfirm('Pular para a próxima fase?'))skipPhase();});
 ['historyModal','settingsModal'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id);}));
 document.addEventListener('keydown',e=>{
   if(document.getElementById('prayerScreen').classList.contains('active')){
     if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nextStep();}
     else if(e.key==='ArrowLeft'){e.preventDefault();prevStep();}
   }
-  if(e.key==='Escape'){closeModal('historyModal');closeModal('settingsModal');}
+  if(e.key==='Escape'){closeModal('historyModal');closeModal('settingsModal');if(document.getElementById('confirmModal').classList.contains('active'))resolveConfirm(false);}
 });
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden&&pomoState.isRunning){
     if(pomoInterval)clearInterval(pomoInterval);
     pomoInterval=setInterval(pomoTick,250);
     pomoTick();
+    if(pomoState.isRunning)requestWakeLock(); // o navegador libera o wake lock sozinho ao esconder a aba
   }
 });
 
 /* ================================================================
    BOOT
 ================================================================ */
+if('serviceWorker'in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{/* segue sem SW (ex.: arquivo local) */});
+  });
+}
+
 (async()=>{
+  setupMediaSession();
   await initTheme();await loadSettings();await loadMode();await loadPomoState();await loadHome();updatePomoUI();await checkOnboarding();
 })();
 </script>
